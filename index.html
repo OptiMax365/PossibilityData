@@ -490,7 +490,7 @@
                 <div class="input-group">
                     <label>Your Identifier (username)</label>
                     <input type="text" class="input-field identifier" id="myIdentifier" 
-                           placeholder="e.g. john-laptop" maxlength="30"
+                           placeholder="e.g. Ultrasend" maxlength="30"
                            pattern="[a-z0-9\-_]+" title="Use lowercase letters, numbers, hyphens, or underscores">
                     <div class="identifier-suggestions">
                         <span class="suggestion-chip" onclick="setIdentifier('my-device')">my-device</span>
@@ -517,7 +517,7 @@
                         <div class="input-group">
                             <label>Join Room Identifier</label>
                             <input type="text" class="input-field identifier" id="joinIdentifier" 
-                                   placeholder="e.g. john-laptop" maxlength="30">
+                                   placeholder="e.g. ultrasend" maxlength="30">
                         </div>
                         <button class="btn btn-success" id="joinRoomBtn" onclick="joinRoom()">
                             🔗 Join Room
@@ -677,10 +677,10 @@
         }
 
         function generateRandomIdentifier() {
-            const words = ['pixel', 'nova', 'zen', 'flux', 'core', 'pulse', 'beam', 'spark', 'wave', 'orbit'];
-            const suffix = Math.floor(Math.random() * 1000);
+            const words = ['Robot', 'nova', 'Big', 'File', 'core', 'pulse', 'beam', 'Text', 'drive', 'orbit'];
+            const suffix = Math.floor(Math.random() * 10);
             const word = words[Math.floor(Math.random() * words.length)];
-            return `${word}-${suffix}`;
+            return `${word} ${suffix}`;
         }
 
         function setIdentifier(value) {
