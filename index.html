@@ -2,65 +2,69 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0a0a0f">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PossibilityData">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📁</text></svg>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📁 POSSIBILITYDATA — Secure File Share</title>
     <style>
-        /* ===== CORE STYLES (Preserved & Enhanced) ===== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* ===== GREEN THEME UPDATE ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg-primary: #0a0a0f; --bg-secondary: #12121a; --bg-card: #1a1a2e;
-            --bg-input: #16213e; --accent: #0f3460; --accent-light: #533483;
-            --highlight: #e94560; --text-primary: #ffffff; --text-secondary: #a0a0b8;
-            --success: #00d474; --warning: #ffa502; --border: #2a2a3e;
-            --glow: rgba(233, 69, 96, 0.3); --glow-green: rgba(0, 212, 116, 0.3);
-            --safe-area-top: env(safe-area-inset-top);
-            --safe-area-bottom: env(safe-area-inset-bottom);
+            --bg-primary: #0a0f0a; --bg-secondary: #0f1a0f; --bg-card: #1a2e1a;
+            --bg-input: #142a14; --accent: #1a5f1a; --accent-light: #2d862d;
+            --highlight: #00c853; --text-primary: #ffffff; --text-secondary: #a8d8a8;
+            --success: #00e676; --warning: #ffb74d; --border: #2a4a2a;
+            --glow: rgba(0, 200, 83, 0.35); --glow-green: rgba(0, 230, 118, 0.4);
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-primary); color: var(--text-primary);
-            min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
-            padding-top: var(--safe-area-top); padding-bottom: var(--safe-area-bottom);
-            -webkit-text-size-adjust: 100%;
+            min-height: 100vh; overflow-x: hidden;
         }
-
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
-        .bg-animation .circle { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.15; animation: float 20s infinite ease-in-out; }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; background: var(--highlight); top: -100px; left: -100px; animation-delay: 0s; }
-        .bg-animation .circle:nth-child(2) { width: 300px; height: 300px; background: var(--accent-light); bottom: -50px; right: -50px; animation-delay: -5s; }
-        .bg-animation .circle:nth-child(3) { width: 250px; height: 250px; background: var(--success); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
-        @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(20px, -20px) scale(1.05); } 50% { transform: translate(0, 20px) scale(0.95); } 75% { transform: translate(-20px, -10px) scale(1.02); } }
-
         .container { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        header { text-align: center; padding: 30px 0 25px; }
-        .logo { font-size: 3rem; margin-bottom: 5px; animation: pulse 2s infinite; display: inline-block; }
+        header { text-align: center; padding: 40px 0 30px; }
+        .logo { font-size: 3rem; margin-bottom: 5px; animation: pulse 2s infinite; }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--highlight), var(--accent-light), var(--success)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--highlight), var(--accent-light), #66bb6a); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
         header p { color: var(--text-secondary); margin-top: 8px; font-size: 1rem; }
-        
-        .tabs { display: flex; gap: 4px; background: var(--bg-secondary); border-radius: 16px; padding: 6px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .tabs { display: flex; gap: 4px; background: var(--bg-secondary); border-radius: 16px; padding: 6px; margin-bottom: 30px; border: 1px solid var(--border); }
         .tab-btn { flex: 1; padding: 14px 20px; border: none; background: transparent; color: var(--text-secondary); font-size: 1rem; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .tab-btn.active { background: linear-gradient(135deg, var(--highlight), var(--accent-light)); color: white; box-shadow: 0 4px 20px var(--glow); }
         .tab-btn:hover:not(.active) { color: var(--text-primary); background: var(--bg-card); }
-        
         .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        .upload-zone { border: 2px dashed var(--border); border-radius: 20px; padding: 45px 25px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: var(--bg-card); position: relative; overflow: hidden; }
+        /* ===== RECEIVER MODE STYLES ===== */
+        .receiver-mode { max-width: 100%; padding: 0; }
+        .receiver-container { max-width: 500px; margin: 0 auto; padding: 30px 20px; text-align: center; }
+        .receiver-icon { font-size: 5rem; margin: 20px 0; animation: pulse 2s infinite; }
+        .receiver-title { font-size: 1.8rem; margin-bottom: 10px; color: var(--success); }
+        .receiver-desc { color: var(--text-secondary); margin-bottom: 30px; font-size: 1.05rem; }
+        .file-preview-large { background: var(--bg-card); border-radius: 20px; padding: 25px; margin: 20px 0; border: 1px solid var(--border); display: flex; flex-direction: column; align-items: center; }
+        .file-icon-large { width: 80px; height: 80px; border-radius: 20px; background: linear-gradient(135deg, var(--highlight), var(--accent-light)); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; margin-bottom: 15px; }
+        .file-name-large { font-weight: 700; font-size: 1.3rem; margin-bottom: 5px; word-break: break-all; }
+        .file-meta { color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 25px; }
+        .download-btn-large { 
+            width: 100%; max-width: 300px; padding: 18px 24px; 
+            border: none; border-radius: 16px; 
+            background: linear-gradient(135deg, var(--highlight), var(--success)); 
+            color: white; font-weight: 800; font-size: 1.2rem; 
+            cursor: pointer; transition: all 0.3s ease; 
+            display: flex; align-items: center; justify-content: center; gap: 10px;
+            box-shadow: 0 6px 25px var(--glow-green);
+            margin: 10px auto;
+        }
+        .download-btn-large:hover { transform: translateY(-3px); box-shadow: 0 8px 35px var(--glow-green); }
+        .download-btn-large:active { transform: translateY(1px); }
+        .download-btn-large:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
+        .receiver-footer { margin-top: 30px; color: var(--text-secondary); font-size: 0.85rem; }
+        
+        .upload-zone { border: 2px dashed var(--border); border-radius: 20px; padding: 50px 30px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: var(--bg-card); position: relative; overflow: hidden; }
         .upload-zone:hover, .upload-zone.dragover { border-color: var(--highlight); box-shadow: 0 0 30px var(--glow); }
         .upload-icon { font-size: 4rem; margin-bottom: 15px; display: block; }
         .upload-zone h3 { font-size: 1.3rem; margin-bottom: 8px; }
         .upload-zone p { color: var(--text-secondary); font-size: 0.9rem; }
         .upload-zone input[type="file"] { display: none; }
-        
         .file-preview { margin-top: 20px; background: var(--bg-input); border-radius: 16px; padding: 20px; display: none; border: 1px solid var(--border); }
         .file-preview.show { display: block; animation: fadeIn 0.3s ease; }
         .file-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
@@ -69,87 +73,55 @@
         .file-name { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .file-size { color: var(--text-secondary); font-size: 0.85rem; margin-top: 2px; }
         .file-type-badge { background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
-        .remove-file { background: rgba(233, 69, 96, 0.2); border: none; color: var(--highlight); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; flex-shrink: 0; }
+        .remove-file { background: rgba(0, 200, 83, 0.2); border: none; color: var(--highlight); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; flex-shrink: 0; }
         .remove-file:hover { background: var(--highlight); color: white; }
-        
         .upload-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, var(--highlight), var(--accent-light)); color: white; box-shadow: 0 4px 20px var(--glow); opacity: 0.5; pointer-events: none; }
         .upload-btn.ready { opacity: 1; pointer-events: all; }
         .upload-btn.ready:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--glow); }
-        .upload-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
-        
         .progress-container { margin-top: 20px; display: none; }
         .progress-container.show { display: block; }
         .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-secondary); }
         .progress-bar-bg { height: 8px; background: var(--bg-input); border-radius: 10px; overflow: hidden; }
         .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success)); border-radius: 10px; width: 0%; transition: width 0.3s ease; }
-        
         .result-box { margin-top: 20px; background: var(--bg-card); border-radius: 16px; padding: 25px; display: none; border: 1px solid var(--success); box-shadow: 0 0 30px var(--glow-green); }
         .result-box.show { display: block; animation: fadeIn 0.4s ease; }
         .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
         .result-header .check-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
         .result-header h3 { color: var(--success); font-size: 1.2rem; }
-        
-        .download-link-container { background: var(--bg-input); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border: 1px solid var(--border); flex-wrap: wrap; }
-        .download-link { flex: 1; min-width: 200px; color: var(--text-primary); font-size: 0.85rem; word-break: break-all; font-family: 'Courier New', monospace; }
+        .download-link-container { background: var(--bg-input); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border: 1px solid var(--border); }
+        .download-link { flex: 1; color: var(--text-primary); font-size: 0.85rem; word-break: break-all; font-family: 'Courier New', monospace; }
         .copy-btn, .share-btn, .qr-btn { padding: 10px 18px; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .copy-btn { background: var(--accent); color: white; }
         .copy-btn:hover { background: var(--accent-light); }
         .share-btn { background: var(--success); color: #000; }
-        .share-btn:hover { background: #00e87e; }
+        .share-btn:hover { background: #00f080; }
         .qr-btn { background: var(--warning); color: #000; }
-        .qr-btn:hover { background: #ffb732; }
-        
-        /* ✅ NEW: Download File Now Button */
-        .download-now-btn {
-            width: 100%;
-            padding: 16px 20px;
-            border: none;
-            border-radius: 14px;
-            font-size: 1.1rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            background: linear-gradient(135deg, var(--success), #00b368);
-            color: #000;
-            box-shadow: 0 4px 20px var(--glow-green);
-        }
-        .download-now-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--glow-green); }
-        .download-now-btn:active { transform: translateY(0); }
-        
+        .qr-btn:hover { background: #ffc266; }
         .unique-id-box { background: var(--bg-input); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid var(--border); }
         .unique-id-box label { color: var(--text-secondary); font-size: 0.85rem; display: block; margin-bottom: 8px; }
         .unique-id { font-size: 1.5rem; font-weight: 800; font-family: 'Courier New', monospace; letter-spacing: 3px; color: var(--highlight); user-select: all; }
-        
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 20px; }
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.8); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); }
         .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-        .modal { background: var(--bg-card); border-radius: 20px; padding: 30px; text-align: center; max-width: 350px; width: 100%; border: 1px solid var(--border); }
+        .modal { background: var(--bg-card); border-radius: 20px; padding: 30px; text-align: center; max-width: 350px; width: 90%; border: 1px solid var(--border); }
         .modal h3 { margin-bottom: 20px; font-size: 1.2rem; }
-        .modal canvas { border-radius: 12px; margin-bottom: 20px; max-width: 100%; height: auto; }
+        .modal canvas { border-radius: 12px; margin-bottom: 20px; }
         .modal-close { padding: 12px 30px; border: none; border-radius: 10px; background: var(--highlight); color: white; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; }
-        .modal-close:hover { background: #ff5a75; }
-        
+        .modal-close:hover { background: #00e060; }
         .download-section { background: var(--bg-card); border-radius: 20px; padding: 30px; border: 1px solid var(--border); }
         .download-section h3 { font-size: 1.3rem; margin-bottom: 8px; text-align: center; }
         .download-section > p { color: var(--text-secondary); text-align: center; margin-bottom: 25px; font-size: 0.9rem; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .input-group input { flex: 1; min-width: 150px; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 1rem; font-family: 'Courier New', monospace; letter-spacing: 2px; transition: border-color 0.3s; outline: none; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .input-group input { flex: 1; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 1rem; font-family: 'Courier New', monospace; letter-spacing: 2px; transition: border-color 0.3s; outline: none; }
         .input-group input:focus { border-color: var(--highlight); }
         .input-group input::placeholder { color: var(--text-secondary); letter-spacing: 0; font-family: 'Segoe UI', sans-serif; }
         .fetch-btn { padding: 14px 28px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--success), #00b368); color: #000; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
         .fetch-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px var(--glow-green); }
-        
         .direct-link-section { margin-top: 15px; }
         .direct-link-section label { color: var(--text-secondary); font-size: 0.85rem; display: block; margin-bottom: 8px; }
         .direct-link-input { width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 0.85rem; outline: none; transition: border-color 0.3s; }
         .direct-link-input:focus { border-color: var(--success); }
         .go-btn { width: 100%; margin-top: 12px; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--accent-light), var(--highlight)); color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; }
         .go-btn:hover { transform: translateY(-2px); }
-        
         .history-section { margin-top: 30px; }
         .history-section h3 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
@@ -161,82 +133,89 @@
         .history-meta { color: var(--text-secondary); font-size: 0.78rem; margin-top: 2px; }
         .history-copy { padding: 8px 14px; border: none; border-radius: 8px; background: var(--accent); color: white; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
         .history-copy:hover { background: var(--accent-light); }
-        .history-delete { padding: 8px 10px; border: none; border-radius: 8px; background: rgba(233, 69, 96, 0.2); color: var(--highlight); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
+        .history-delete { padding: 8px 10px; border: none; border-radius: 8px; background: rgba(0, 200, 83, 0.2); color: var(--highlight); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
         .history-delete:hover { background: var(--highlight); color: white; }
         .clear-history { margin-top: 15px; padding: 10px 20px; border: 1px solid var(--highlight); border-radius: 10px; background: transparent; color: var(--highlight); font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; }
         .clear-history:hover { background: var(--highlight); color: white; }
         .empty-history { text-align: center; color: var(--text-secondary); padding: 30px; font-size: 0.9rem; }
-        
-        .toast { position: fixed; bottom: calc(20px + var(--safe-area-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--bg-card); color: var(--text-primary); padding: 14px 28px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; z-index: 2000; transition: transform 0.4s ease; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center; }
+        .toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--bg-card); color: var(--text-primary); padding: 14px 28px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; z-index: 2000; transition: transform 0.4s ease; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); display: flex; align-items: center; gap: 10px; }
         .toast.show { transform: translateX(-50%) translateY(0); }
         .toast.success { border-color: var(--success); }
         .toast.error { border-color: var(--highlight); }
-        
-        footer { text-align: center; padding: 30px 0 20px; margin-top: auto; color: var(--text-secondary); font-size: 0.8rem; }
+        footer { text-align: center; padding: 30px 0; margin-top: auto; color: var(--text-secondary); font-size: 0.8rem; }
         footer a { color: var(--highlight); text-decoration: none; }
-        
         .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-        
-        /* ===== MOBILE OPTIMIZATIONS ===== */
         @media (max-width: 600px) {
-            header h1 { font-size: 1.6rem; } 
-            .logo { font-size: 2.5rem; }
-            .upload-zone { padding: 35px 20px; } 
-            .upload-icon { font-size: 3rem; }
-            .download-link-container { flex-direction: column; align-items: stretch; }
-            .download-link { min-width: auto; text-align: center; }
-            .copy-btn, .share-btn, .qr-btn { justify-content: center; }
+            header h1 { font-size: 1.6rem; } .logo { font-size: 2.5rem; }
+            .upload-zone { padding: 35px 20px; } .upload-icon { font-size: 3rem; }
+            .download-link-container { flex-direction: column; }
             .input-group { flex-direction: column; }
             .unique-id { font-size: 1.2rem; letter-spacing: 2px; }
             .tab-btn { font-size: 0.85rem; padding: 12px 10px; }
             .result-box { padding: 18px; }
-            .modal { padding: 25px 20px; }
-            .config-row { flex-direction: column; align-items: flex-start; gap: 8px; }
-            .config-row label { min-width: auto; }
-            .config-row input, .config-row select { width: 100%; min-width: auto; }
+            .receiver-container { padding: 20px 15px; }
+            .receiver-icon { font-size: 4rem; }
+            .file-icon-large { width: 70px; height: 70px; font-size: 2.2rem; }
+            .download-btn-large { padding: 16px 20px; font-size: 1.1rem; }
         }
-        
-        /* File type icons */
-        .icon-image { background: linear-gradient(135deg, #e94560, #ff6b81) !important; }
-        .icon-video { background: linear-gradient(135deg, #533483, #8854d0) !important; }
-        .icon-audio { background: linear-gradient(135deg, #ffa502, #ff6348) !important; }
-        .icon-pdf { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
-        .icon-zip { background: linear-gradient(135deg, #f39c12, #e67e22) !important; }
-        .icon-doc { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
-        .icon-code { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; }
-        .icon-other { background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important; }
-        
+        .icon-image { background: linear-gradient(135deg, #00c853, #69f0ae) !important; }
+        .icon-video { background: linear-gradient(135deg, #2d862d, #4caf50) !important; }
+        .icon-audio { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
+        .icon-pdf { background: linear-gradient(135deg, #e57373, #f44336) !important; }
+        .icon-zip { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
+        .icon-doc { background: linear-gradient(135deg, #64b5f6, #2196f3) !important; }
+        .icon-code { background: linear-gradient(135deg, #4caf50, #2e7d32) !important; }
+        .icon-other { background: linear-gradient(135deg, #90a4ae, #607d8b) !important; }
         .config-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
         .config-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
         .config-row label { color: var(--text-secondary); font-size: 0.9rem; min-width: 100px; }
         .config-row input, .config-row select { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-input); color: var(--text-primary); font-size: 0.9rem; }
         .config-row input:focus, .config-row select:focus { outline: none; border-color: var(--highlight); }
         .save-config-btn { padding: 10px 24px; background: var(--success); color: #000; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
-        .save-config-btn:hover { background: #00e87e; }
-        
+        .save-config-btn:hover { background: #00f080; }
         .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
         .status-online { background: var(--success); box-shadow: 0 0 10px var(--glow-green); }
         .status-offline { background: var(--highlight); box-shadow: 0 0 10px var(--glow); }
         
-        /* iOS specific tweaks */
-        @supports (-webkit-touch-callout: none) {
-            .upload-btn, .download-now-btn, .fetch-btn, .go-btn, .tab-btn {
-                -webkit-appearance: none;
-            }
-        }
+        /* Hide main app in receiver mode */
+        body.receiver-mode .container > *:not(.receiver-container) { display: none; }
+        body:not(.receiver-mode) .receiver-container { display: none; }
     </style>
 </head>
 <body>
-    <div class="bg-animation">
-        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
+    <!-- RECEIVER MODE CONTAINER (shown when URL has #receiver?url=...) -->
+    <div class="receiver-container" id="receiverContainer">
+        <div class="receiver-icon">📥</div>
+        <h1 class="receiver-title">File Ready for Download</h1>
+        <p class="receiver-desc" id="receiverDesc">Tap the button below to download your file securely</p>
+        
+        <div class="file-preview-large">
+            <div class="file-icon-large" id="receiverFileIcon">📄</div>
+            <div class="file-name-large" id="receiverFileName">filename.jpg</div>
+            <div class="file-meta" id="receiverFileMeta">2.4 MB • Image</div>
+        </div>
+        
+        <button class="download-btn-large" id="receiverDownloadBtn" onclick="triggerDownload()">
+            ⬇️ Download File
+        </button>
+        
+        <div class="receiver-footer">
+            <p>🔒 Secure transfer • No account needed • File expires per sender settings</p>
+            <p style="margin-top: 8px; font-size: 0.8rem;">PossibilityData © 2026</p>
+        </div>
     </div>
 
-    <div class="container">
+    <!-- MAIN APP CONTAINER (hidden in receiver mode) -->
+    <div class="container" id="mainContainer">
+        <div class="bg-animation">
+            <div class="circle"></div><div class="circle"></div><div class="circle"></div>
+        </div>
+
         <header>
             <span class="logo">📁</span>
             <h1>PossibilityData</h1>
-            <p>Secure • Private • No 0x0.st • Works for texts, videos, files</p>
+            <p>Secure • Private • Works for texts, videos, files</p>
         </header>
 
         <!-- 🔧 CONFIG PANEL -->
@@ -318,14 +297,8 @@
                     <button class="share-btn" onclick="shareLink()">📤 Share</button>
                     <button class="qr-btn" onclick="showQR()">📱 QR</button>
                 </div>
-                
-                <!-- ✅ NEW: Download File Now Button (Mobile Optimized) -->
-                <button class="download-now-btn" id="downloadNowBtn" onclick="triggerMobileDownload()">
-                    📥 Download File Now
-                </button>
-                
-                <p style="color: var(--text-secondary); font-size: 0.82rem; text-align: center; margin-top: 15px;">
-                    📱 Open this link on your phone or enter the ID in the <strong>Download</strong> tab
+                <p style="color: var(--text-secondary); font-size: 0.82rem; text-align: center; margin-top: 10px;">
+                    📱 Scan QR or open link on phone — <strong>green download button appears automatically</strong>
                 </p>
             </div>
         </div>
@@ -336,12 +309,12 @@
                 <h3>📥 Download Your File</h3>
                 <p>Enter the Unique ID or paste the full download link</p>
                 <div class="input-group">
-                    <input type="text" id="codeInput" placeholder="e.g. PD-abc123" oninput="this.value = this.value.toUpperCase()" autocapitalize="characters" autocorrect="off" spellcheck="false">
+                    <input type="text" id="codeInput" placeholder="e.g. PD-abc123" oninput="this.value = this.value.toUpperCase()">
                     <button class="fetch-btn" onclick="fetchById()">Fetch</button>
                 </div>
                 <div class="direct-link-section">
                     <label>Or paste the full download URL:</label>
-                    <input type="url" class="direct-link-input" id="urlInput" placeholder="https://..." inputmode="url">
+                    <input type="text" class="direct-link-input" id="urlInput" placeholder="https://...">
                     <button class="go-btn" onclick="fetchByUrl()">🚀 Open Download</button>
                 </div>
                 <div style="margin-top: 25px; padding: 20px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
@@ -388,56 +361,126 @@
     <div class="toast" id="toast"></div>
 
     <script>
-        // ===== MOBILE DETECTION UTILITIES =====
-        function isIOS() {
-            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
-                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
-        }
-        
-        function isAndroid() {
-            return /Android/.test(navigator.userAgent);
-        }
-        
-        function isMobile() {
-            return isIOS() || isAndroid() || /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-        }
-
-        // ✅ MOBILE-OPTIMIZED DOWNLOAD HANDLER
-        function triggerMobileDownload(url) {
-            if (!url) {
-                showToast('⚠️ No download URL available', 'error');
+        // ===== CHECK FOR RECEIVER MODE ON LOAD =====
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check URL hash for receiver mode: #receiver?url=ENCODED_URL
+            const hash = window.location.hash;
+            if (hash.startsWith('#receiver?url=')) {
+                const encodedUrl = hash.substring(14); // remove '#receiver?url='
+                const downloadUrl = decodeURIComponent(encodedUrl);
+                initReceiverMode(downloadUrl);
                 return;
             }
             
-            // iOS Safari: Open in same tab (only reliable method for cross-origin)
-            if (isIOS()) {
-                // Show helpful message for iOS users
-                showToast('📱 iOS: File will open in new tab. Tap ⬇️ to save.', 'success');
-                // Small delay to allow toast to show, then open
-                setTimeout(() => {
-                    const newWindow = window.open(url, '_blank');
-                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
-                        // Fallback if popup blocked
-                        window.location.href = url;
-                    }
-                }, 500);
-            } 
-            // Android Chrome: Use window.open (handles downloads well)
-            else if (isAndroid()) {
-                window.open(url, '_blank');
-                showToast('📥 Download starting on Android...', 'success');
-            } 
-            // Desktop: Try download attribute, fallback to new tab
-            else {
+            // Also check for legacy format: #download/URL
+            if (hash.startsWith('#download/')) {
+                const downloadUrl = decodeURIComponent(hash.substring(10));
+                initReceiverMode(downloadUrl);
+                return;
+            }
+            
+            // Normal app initialization
+            loadConfig();
+            renderHistory();
+            setupDragDrop();
+            updateBackend();
+        });
+
+        // ===== RECEIVER MODE INITIALIZATION =====
+        function initReceiverMode(downloadUrl) {
+            // Switch to receiver mode UI
+            document.body.classList.add('receiver-mode');
+            
+            // Parse file info from URL (best effort)
+            const fileName = extractFileNameFromUrl(downloadUrl);
+            const fileExt = fileName.split('.').pop().toLowerCase();
+            const fileSize = 'File'; // We don't have size info from URL alone
+            
+            // Update receiver UI
+            document.getElementById('receiverFileName').textContent = fileName;
+            document.getElementById('receiverFileMeta').textContent = `${fileSize} • ${fileExt.toUpperCase()}`;
+            document.getElementById('receiverFileIcon').textContent = getFileIcon(fileExt);
+            document.getElementById('receiverFileIcon').className = 'file-icon-large ' + getIconClass(fileExt);
+            
+            // Store the download URL for the button
+            document.getElementById('receiverDownloadBtn').dataset.url = downloadUrl;
+            
+            // Update page title
+            document.title = `📥 Download: ${fileName} • PossibilityData`;
+        }
+        
+        // ===== TRIGGER DOWNLOAD IN RECEIVER MODE =====
+        async function triggerDownload() {
+            const btn = document.getElementById('receiverDownloadBtn');
+            const downloadUrl = btn.dataset.url;
+            
+            if (!downloadUrl) {
+                showToast('⚠️ No download URL found', 'error');
+                return;
+            }
+            
+            // Show loading state
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Preparing...';
+            
+            try {
+                // For tmpfiles.org and similar services, we can often just redirect
+                // For CORS-enabled servers, we could fetch and trigger download
+                // We'll use a smart approach: try direct download first
+                
+                // Special handling for tmpfiles.org (convert /d/ to direct download)
+                let finalUrl = downloadUrl;
+                if (downloadUrl.includes('tmpfiles.org')) {
+                    finalUrl = downloadUrl.replace('/d/', '/dl/');
+                }
+                
+                // Try to trigger download via anchor tag (works for most cases)
                 const a = document.createElement('a');
-                a.href = url;
-                a.target = '_blank';
-                a.rel = 'noopener noreferrer';
-                // Note: download attribute only works for same-origin or blob URLs
+                a.href = finalUrl;
+                a.download = ''; // Let server suggest filename
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
-                showToast('📥 Download initiated', 'success');
+                
+                showToast('✅ Download started!', 'success');
+                
+                // Show confirmation after delay
+                setTimeout(() => {
+                    document.getElementById('receiverDesc').textContent = '✓ Your download should be starting... Check your browser\'s download bar!';
+                }, 1500);
+                
+            } catch (error) {
+                console.error('Download error:', error);
+                showToast('⚠️ Download blocked. Try long-pressing the button and "Open in new tab"', 'error');
+                // Fallback: open in new tab
+                window.open(downloadUrl, '_blank');
+            } finally {
+                // Restore button after delay
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
+                }, 2000);
+            }
+        }
+        
+        // ===== HELPER: Extract filename from URL =====
+        function extractFileNameFromUrl(url) {
+            try {
+                // Try to get filename from URL path
+                const pathname = new URL(url).pathname;
+                const filename = pathname.split('/').pop();
+                if (filename && filename.includes('.')) return filename;
+                
+                // Fallback: use query parameter if present
+                const urlObj = new URL(url);
+                const nameParam = urlObj.searchParams.get('name') || urlObj.searchParams.get('file');
+                if (nameParam) return nameParam;
+                
+                // Last fallback: generic name
+                return 'downloaded-file';
+            } catch (e) {
+                return 'downloaded-file';
             }
         }
 
@@ -448,10 +491,11 @@
                 parseResponse: (text) => {
                     try {
                         const data = JSON.parse(text);
-                        return data.data?.url?.replace('/dl/', '/d/');
+                        // tmpfiles returns: { "status": "success", "data": { "url": "https://tmpfiles.org/dl/xxxx/filename.jpg" } }
+                        return data.data?.url?.replace('/dl/', '/d/'); // /d/ is direct download
                     } catch { return null; }
                 },
-                maxSize: 100 * 1024 * 1024,
+                maxSize: 100 * 1024 * 1024, // 100MB
                 expiry: '60 minutes'
             },
             storage: {
@@ -462,21 +506,23 @@
                         return data.url || data.download_url || null;
                     } catch { return null; }
                 },
-                maxSize: 25 * 1024 * 1024 * 1024,
+                maxSize: 25 * 1024 * 1024 * 1024, // 25GB
                 expiry: '3 days'
             },
             custom: {
-                url: '',
+                url: '', // set via config
                 parseResponse: (text) => {
+                    // Try to extract URL from common response formats
                     try {
                         const data = JSON.parse(text);
                         return data.url || data.download_url || data.file_url || data.link || null;
                     } catch {
+                        // Fallback: if response is plain URL
                         if (text.trim().startsWith('http')) return text.trim();
                         return null;
                     }
                 },
-                maxSize: null,
+                maxSize: null, // user-defined
                 expiry: 'configurable'
             }
         };
@@ -484,22 +530,15 @@
         // ===== GLOBAL STATE =====
         let selectedFile = null;
         let uploadHistory = JSON.parse(localStorage.getItem('possibilitydata_history') || '[]');
-        let currentBackend = 'tmpfiles';
-        let currentDownloadUrl = ''; // Store for download button
+        let currentBackend = 'tmpfiles'; // default
 
-        // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', () => {
+        // ===== INIT FOR MAIN APP =====
+        function initMainApp() {
             loadConfig();
             renderHistory();
             setupDragDrop();
             updateBackend();
-            
-            // PWA: Register service worker if available
-            if ('serviceWorker' in navigator) {
-                // Note: Add your actual sw.js path when deploying
-                // navigator.serviceWorker.register('/sw.js').catch(console.log);
-            }
-        });
+        }
 
         function loadConfig() {
             const saved = localStorage.getItem('possibilitydata_config');
@@ -541,20 +580,23 @@
         }
 
         function updateBackend() {
-            const backend = document.getElementById('backendSelect').value;
-            document.getElementById('customUrlRow').style.display = backend === 'custom' ? 'flex' : 'none';
-            
-            const info = BACKENDS[backend];
+            const backend = BACKENDS[currentBackend];
             document.getElementById('statusText').textContent = 
-                `${info.maxSize ? formatFileSize(info.maxSize) + ' max' : 'Custom'} • ${info.expiry} expiry`;
+                `${backend.maxSize ? formatFileSize(backend.maxSize) + ' max' : 'Custom'} • ${backend.expiry} expiry`;
             
+            // Update drop zone hint
             const dropZone = document.getElementById('dropZone');
-            dropZone.querySelector('p').textContent = 
-                `Images, Videos, Documents — ${info.maxSize ? 'up to ' + formatFileSize(info.maxSize) : 'size depends on server'}`;
+            if (dropZone) {
+                dropZone.querySelector('p').textContent = 
+                    `Images, Videos, Documents — ${backend.maxSize ? 'up to ' + formatFileSize(backend.maxSize) : 'size depends on server'}`;
+            }
         }
 
         // ===== TAB SWITCHING =====
         function switchTab(tab) {
+            // Don't allow tab switching in receiver mode
+            if (document.body.classList.contains('receiver-mode')) return;
+            
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
@@ -564,16 +606,18 @@
         // ===== DRAG & DROP =====
         function setupDragDrop() {
             const dropZone = document.getElementById('dropZone');
+            if (!dropZone) return;
+            
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-                dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false);
+                dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
             });
-            dropZone.addEventListener('dragenter', () => dropZone.classList.add('dragover'), false);
-            dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'), false);
-            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'), false);
+            dropZone.addEventListener('dragenter', () => dropZone.classList.add('dragover'));
+            dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
             dropZone.addEventListener('drop', e => {
                 dropZone.classList.remove('dragover');
                 if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-            }, false);
+            });
             document.getElementById('fileInput').addEventListener('change', e => {
                 if (e.target.files.length) handleFile(e.target.files[0]);
             });
@@ -648,18 +692,18 @@
                         if (!downloadUrl) {
                             throw new Error('Could not parse download URL from response');
                         }
-                        
-                        // ✅ Store URL for download button
-                        currentDownloadUrl = downloadUrl;
-                        
                         const uniqueId = generateUniqueId();
                         document.getElementById('downloadLink').textContent = downloadUrl;
                         document.getElementById('uniqueId').textContent = uniqueId;
                         document.getElementById('resultBox').classList.add('show');
 
+                        // Create receiver-friendly link with encoded URL in hash
+                        const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(downloadUrl)}`;
+                        
                         const historyItem = {
                             id: uniqueId, name: selectedFile.name,
                             size: formatFileSize(selectedFile.size), url: downloadUrl,
+                            receiverUrl: receiverLink, // Store the receiver-friendly link
                             type: selectedFile.name.split('.').pop().toUpperCase(),
                             date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
                             backend: currentBackend
@@ -667,7 +711,7 @@
                         uploadHistory.unshift(historyItem);
                         localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
                         renderHistory();
-                        showToast('✅ File uploaded successfully!', 'success');
+                        showToast('✅ File uploaded! Share the QR or link', 'success');
                     } else {
                         throw new Error(`Server responded with ${xhr.status}`);
                     }
@@ -695,7 +739,10 @@
             if (!code) { showToast('⚠️ Please enter a valid ID', 'error'); return; }
             const found = uploadHistory.find(h => h.id.toUpperCase() === code.toUpperCase());
             if (found) { 
-                triggerMobileDownload(found.url); 
+                // Use receiver-friendly URL if available
+                const urlToOpen = found.receiverUrl || found.url;
+                window.open(urlToOpen, '_blank'); 
+                showToast('📥 Opening download...', 'success'); 
                 return; 
             }
             showToast('⚠️ ID not found in local history. Paste the full URL instead.', 'error');
@@ -704,42 +751,53 @@
         function fetchByUrl() {
             const url = document.getElementById('urlInput').value.trim();
             if (!url || !url.startsWith('http')) { showToast('⚠️ Please paste a valid download URL', 'error'); return; }
-            triggerMobileDownload(url);
+            
+            // Convert to receiver-friendly format if it's a raw backend URL
+            let finalUrl = url;
+            if (!url.includes('#receiver') && !url.includes('#download')) {
+                finalUrl = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(url)}`;
+            }
+            
+            window.open(finalUrl, '_blank');
+            showToast('📥 Opening download...', 'success');
         }
 
         // ===== COPY & SHARE =====
         function copyLink() {
-            const link = document.getElementById('downloadLink').textContent;
-            navigator.clipboard.writeText(link).then(() => showToast('📋 Link copied!', 'success'))
+            // Copy the receiver-friendly link instead of raw URL
+            const rawLink = document.getElementById('downloadLink').textContent;
+            const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
+            
+            navigator.clipboard.writeText(receiverLink).then(() => showToast('📋 Receiver link copied!', 'success'))
                 .catch(() => {
-                    const ta = document.createElement('textarea'); ta.value = link;
+                    const ta = document.createElement('textarea'); ta.value = receiverLink;
                     document.body.appendChild(ta); ta.select(); document.execCommand('copy');
-                    document.body.removeChild(ta); showToast('📋 Link copied!', 'success');
+                    document.body.removeChild(ta); showToast('📋 Receiver link copied!', 'success');
                 });
         }
 
         async function shareLink() {
-            const link = document.getElementById('downloadLink').textContent;
+            const rawLink = document.getElementById('downloadLink').textContent;
+            const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
+            
             if (navigator.share) {
                 try {
-                    await navigator.share({ title: 'PossibilityData', text: 'Download your file', url: link });
+                    await navigator.share({ title: 'PossibilityData', text: 'Download your file', url: receiverLink });
                 } catch { copyLink(); }
             } else { copyLink(); }
         }
 
         // ===== QR CODE =====
         function showQR() {
-            const link = document.getElementById('downloadLink').textContent;
+            const rawLink = document.getElementById('downloadLink').textContent;
+            // Create receiver-friendly link for QR code
+            const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
+            
             const canvas = document.getElementById('qrCanvas');
-            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(link)}&bgcolor=1a1a2e&color=ffffff&margin=10`;
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(receiverLink)}&bgcolor=1a2e1a&color=ffffff&margin=10`;
             const img = new Image();
             img.crossOrigin = "Anonymous";
-            img.onload = () => {
-                const ctx = canvas.getContext('2d');
-                ctx.fillStyle = '#1a1a2e';
-                ctx.fillRect(0, 0, 250, 250);
-                ctx.drawImage(img, 0, 0, 250, 250);
-            };
+            img.onload = () => canvas.getContext('2d').drawImage(img, 0, 0, 250, 250);
             img.src = qrApiUrl;
             document.getElementById('qrModal').classList.add('show');
         }
@@ -749,6 +807,8 @@
         function renderHistory() {
             const list = document.getElementById('historyList');
             const clearBtn = document.getElementById('clearHistoryBtn');
+            if (!list) return;
+            
             if (uploadHistory.length === 0) {
                 list.innerHTML = '<div class="empty-history">No files uploaded yet.</div>';
                 clearBtn.style.display = 'none'; return;
@@ -766,7 +826,10 @@
                 </div>`).join('');
         }
         function copyHistoryLink(index) {
-            navigator.clipboard.writeText(uploadHistory[index].url).then(() => showToast('📋 Link copied!', 'success'));
+            // Copy receiver-friendly link
+            const item = uploadHistory[index];
+            const linkToCopy = item.receiverUrl || item.url;
+            navigator.clipboard.writeText(linkToCopy).then(() => showToast('📋 Link copied!', 'success'));
         }
         function deleteHistoryItem(index) {
             uploadHistory.splice(index, 1);
@@ -808,11 +871,11 @@
         }
         function getIconClass(ext) {
             const imageExts = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'],
-                  videoExts = ['mp4','avi','mov','mkv','webm','flv','wmv'],
-                  audioExts = ['mp3','wav','flac','aac','ogg','wma'],
-                  docExts = ['pdf'], zipExts = ['zip','rar','7z','tar','gz'],
-                  docFileExts = ['doc','docx','txt','rtf','xls','xlsx','csv','ppt','pptx'],
-                  codeExts = ['js','html','css','py','java','cpp'];
+                videoExts = ['mp4','avi','mov','mkv','webm','flv','wmv'],
+                audioExts = ['mp3','wav','flac','aac','ogg','wma'],
+                docExts = ['pdf'], zipExts = ['zip','rar','7z','tar','gz'],
+                docFileExts = ['doc','docx','txt','rtf','xls','xlsx','csv','ppt','pptx'],
+                codeExts = ['js','html','css','py','java','cpp'];
             if (imageExts.includes(ext)) return 'icon-image';
             if (videoExts.includes(ext)) return 'icon-video';
             if (audioExts.includes(ext)) return 'icon-audio';
@@ -824,11 +887,12 @@
         }
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
+            if (!toast) return;
             toast.textContent = message;
             toast.className = 'toast ' + type + ' show';
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
-        document.getElementById('qrModal').addEventListener('click', e => { if (e.target.id === 'qrModal') closeQR(); });
+        document.getElementById('qrModal')?.addEventListener('click', e => { if (e.target.id === 'qrModal') closeQR(); });
         document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQR(); });
     </script>
 </body>
