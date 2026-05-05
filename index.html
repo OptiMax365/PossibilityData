@@ -3,895 +3,279 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#0a1a0f">
+    <meta name="theme-color" content="#0a0a0f">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="PossibilityData">
-    <title>📁 POSSIBILITYDATA — Secure Local Share</title>
-    <link rel="manifest" href="data:application/manifest+json,{
-        %22name%22:%22PossibilityData%22,
-        %22short_name%22:%22PossibilityData%22,
-        %22start_url%22:%22.%22,
-        %22display%22:%22standalone%22,
-        %22background_color%22:%22%230a1a0f%22,
-        %22theme_color%22:%22%230a1a0f%22,
-        %22icons%22:[{
-            %22src%22:%22data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90' fill='%2300d474'%3E📁%3C/text%3E%3C/svg%3E%22,
-            %22sizes%22:%22192x192%22,
-            %22type%22:%22image/svg+xml%22
-        }]
-    }">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📁</text></svg>">
+    <title>📁 POSSIBILITYDATA — Secure File Share</title>
     <style>
-        /* ===== RESET & BASE ===== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        /* ===== CORE STYLES (Preserved & Enhanced) ===== */
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         :root {
-            /* GREEN THEME */
-            --bg-primary: #0a1a0f; --bg-secondary: #0f2a1a; --bg-card: #153a25;
-            --bg-input: #1a4a30; --accent: #0f4a30; --accent-light: #2a7a55;
-            --highlight: #00d474; --text-primary: #f0fff8; --text-secondary: #a8d8c0;
-            --success: #00e884; --warning: #ffd460; --border: #2a5a40;
-            --glow: rgba(0, 212, 116, 0.35); --glow-green: rgba(0, 232, 132, 0.4);
-            --pulse: rgba(0, 212, 116, 0.2);
-            --shadow: rgba(0, 30, 20, 0.5);
+            --bg-primary: #0a0a0f; --bg-secondary: #12121a; --bg-card: #1a1a2e;
+            --bg-input: #16213e; --accent: #0f3460; --accent-light: #533483;
+            --highlight: #e94560; --text-primary: #ffffff; --text-secondary: #a0a0b8;
+            --success: #00d474; --warning: #ffa502; --border: #2a2a3e;
+            --glow: rgba(233, 69, 96, 0.3); --glow-green: rgba(0, 212, 116, 0.3);
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
         }
-        html, body { width: 100%; height: 100%; scroll-behavior: smooth; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: var(--bg-primary); color: var(--text-primary);
-            min-height: 100vh; overflow-x: hidden;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
+            min-height: 100vh; min-height: 100dvh; overflow-x: hidden;
+            padding-top: var(--safe-area-top); padding-bottom: var(--safe-area-bottom);
+            -webkit-text-size-adjust: 100%;
         }
-        /* Prevent unwanted navigation */
-        a { pointer-events: none; cursor: default; text-decoration: none; color: inherit; }
-        button, .upload-zone, .tab-btn, .copy-btn, .share-btn, .qr-btn, .fetch-btn, .go-btn, 
-        .remove-file, .history-copy, .history-delete, .clear-history, .modal-close, .save-config-btn,
-        .download-btn-now {
-            user-select: none; -webkit-user-select: none;
-            -webkit-touch-callout: none;
-            cursor: pointer;
-            -webkit-tap-highlight-color: transparent;
-        }
+
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-animation .circle { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.15; animation: float 20s infinite ease-in-out; }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; background: var(--highlight); top: -100px; left: -100px; animation-delay: 0s; }
+        .bg-animation .circle:nth-child(2) { width: 300px; height: 300px; background: var(--accent-light); bottom: -50px; right: -50px; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 250px; height: 250px; background: var(--success); top: 50%; left: 50%; transform: translate(-50%, -50%); animation-delay: -10s; }
+        @keyframes float { 0%, 100% { transform: translate(0, 0) scale(1); } 25% { transform: translate(20px, -20px) scale(1.05); } 50% { transform: translate(0, 20px) scale(0.95); } 75% { transform: translate(-20px, -10px) scale(1.02); } }
+
+        .container { position: relative; z-index: 1; max-width: 800px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
         
-        /* ===== ANIMATED GREEN BACKGROUND ===== */
-        .bg-animation {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0; overflow: hidden; pointer-events: none;
-        }
-        .bg-animation .circle {
-            position: absolute; border-radius: 50%; opacity: 0.06;
-            animation: float 25s infinite ease-in-out;
-            filter: blur(2px);
-        }
-        .bg-animation .circle:nth-child(1) {
-            width: 700px; height: 700px; background: var(--highlight);
-            top: -250px; left: -150px; animation-delay: 0s;
-        }
-        .bg-animation .circle:nth-child(2) {
-            width: 500px; height: 500px; background: var(--accent-light);
-            bottom: -200px; right: -150px; animation-delay: -8s;
-        }
-        .bg-animation .circle:nth-child(3) {
-            width: 400px; height: 400px; background: var(--success);
-            top: 50%; left: 50%; transform: translate(-50%, -50%);
-            animation-delay: -15s;
-        }
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(60px, -60px) scale(1.12); }
-            50% { transform: translate(-40px, 40px) scale(0.92); }
-            75% { transform: translate(50px, 50px) scale(1.08); }
-        }
-
-        /* ===== CONTAINER ===== */
-        .container {
-            position: relative; z-index: 1; max-width: 780px;
-            margin: 0 auto; padding: 16px; min-height: 100vh;
-            display: flex; flex-direction: column;
-        }
-
-        /* ===== HEADER ===== */
-        header { text-align: center; padding: 28px 0 18px; }
-        .logo { 
-            font-size: 3.2rem; margin-bottom: 6px; 
-            animation: pulse 2.2s infinite; display: inline-block;
-            text-shadow: 0 0 20px var(--glow-green);
-        }
-        @keyframes pulse { 
-            0%, 100% { transform: scale(1); } 
-            50% { transform: scale(1.18); } 
-        }
-        header h1 {
-            font-size: 2.1rem; font-weight: 800;
-            background: linear-gradient(135deg, var(--highlight), var(--success), var(--accent-light));
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; letter-spacing: -0.5px;
-            margin-bottom: 4px; text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-        header p { color: var(--text-secondary); margin-top: 4px; font-size: 0.98rem; }
-        .device-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            background: rgba(0, 40, 25, 0.8); border: 1px solid var(--border);
-            padding: 5px 14px; border-radius: 24px; font-size: 0.82rem;
-            margin-top: 10px; color: var(--success); font-weight: 600;
-            box-shadow: 0 2px 12px var(--glow);
-        }
-        .device-badge.laptop { background: rgba(0, 50, 30, 0.9); border-color: var(--success); }
-        .device-badge.phone { background: rgba(30, 20, 40, 0.9); border-color: var(--warning); color: var(--warning); }
-
-        /* ===== CONFIG PANEL ===== */
-        .config-panel {
-            background: var(--bg-card); border-radius: 18px; padding: 18px;
-            margin-bottom: 20px; border: 1px solid var(--border);
-            display: flex; flex-wrap: wrap; align-items: center; gap: 12px;
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-        .config-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-        .config-row label { color: var(--text-secondary); font-size: 0.87rem; min-width: 85px; font-weight: 500; }
-        .config-row select, .config-row input {
-            padding: 9px 14px; border: 1px solid var(--border); border-radius: 10px;
-            background: var(--bg-input); color: var(--text-primary);
-            font-size: 0.87rem; min-width: 160px;
-            transition: all 0.2s;
-        }
-        .config-row select:focus, .config-row input:focus { 
-            outline: none; border-color: var(--highlight); 
-            box-shadow: 0 0 0 3px var(--pulse);
-        }
-        .save-config-btn {
-            padding: 9px 18px; background: linear-gradient(135deg, var(--success), var(--highlight)); 
-            color: #052015; border: none; border-radius: 10px; font-weight: 700;
-            cursor: pointer; transition: all 0.25s; font-size: 0.87rem;
-            display: flex; align-items: center; gap: 5px;
-            box-shadow: 0 3px 15px var(--glow-green);
-        }
-        .save-config-btn:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 5px 22px var(--glow-green);
-            background: linear-gradient(135deg, #00f090, #00e080);
-        }
-        .save-config-btn:active { transform: translateY(0); }
-        .status-indicator { 
-            display: inline-block; width: 9px; height: 9px; border-radius: 50%; 
-            margin-right: 5px; animation: pulse-dot 2s infinite;
-        }
-        .status-online { background: var(--success); box-shadow: 0 0 10px var(--glow-green); }
-        @keyframes pulse-dot { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
-        .storage-info { 
-            font-size: 0.82rem; color: var(--text-secondary); 
-            margin-left: auto; display: flex; align-items: center; gap: 5px;
-            background: rgba(0, 30, 20, 0.4); padding: 4px 10px; border-radius: 8px;
-        }
-
-        /* ===== TABS ===== */
-        .tabs {
-            display: flex; gap: 5px; background: var(--bg-secondary);
-            border-radius: 18px; padding: 5px; margin-bottom: 26px;
-            border: 1px solid var(--border);
-            box-shadow: 0 3px 15px var(--shadow);
-        }
-        .tab-btn {
-            flex: 1; padding: 13px 18px; border: none; background: transparent;
-            color: var(--text-secondary); font-size: 0.92rem; font-weight: 700;
-            border-radius: 14px; cursor: pointer; transition: all 0.25s ease;
-            display: flex; align-items: center; justify-content: center; gap: 7px;
-            position: relative; overflow: hidden;
-        }
-        .tab-btn::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
-            opacity: 0; transition: opacity 0.25s; border-radius: 14px;
-        }
-        .tab-btn.active {
-            color: white; box-shadow: 0 4px 20px var(--glow);
-            transform: translateY(-2px);
-        }
-        .tab-btn.active::after { opacity: 1; }
-        .tab-btn:hover:not(.active) { 
-            color: var(--text-primary); 
-            background: var(--bg-card);
-            transform: translateY(-1px);
-        }
-        .tab-content { display: none; animation: fadeIn 0.35s ease; }
+        header { text-align: center; padding: 30px 0 25px; }
+        .logo { font-size: 3rem; margin-bottom: 5px; animation: pulse 2s infinite; display: inline-block; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(135deg, var(--highlight), var(--accent-light), var(--success)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; letter-spacing: -1px; }
+        header p { color: var(--text-secondary); margin-top: 8px; font-size: 1rem; }
+        
+        .tabs { display: flex; gap: 4px; background: var(--bg-secondary); border-radius: 16px; padding: 6px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .tab-btn { flex: 1; padding: 14px 20px; border: none; background: transparent; color: var(--text-secondary); font-size: 1rem; font-weight: 600; border-radius: 12px; cursor: pointer; transition: all 0.3s ease; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .tab-btn.active { background: linear-gradient(135deg, var(--highlight), var(--accent-light)); color: white; box-shadow: 0 4px 20px var(--glow); }
+        .tab-btn:hover:not(.active) { color: var(--text-primary); background: var(--bg-card); }
+        
+        .tab-content { display: none; animation: fadeIn 0.4s ease; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* ===== UPLOAD ZONE - CLICK TO OPEN FILE PICKER ===== */
-        .upload-zone {
-            border: 2.5px dashed var(--border); border-radius: 22px;
-            padding: 44px 26px; text-align: center; 
-            transition: all 0.35s ease; background: var(--bg-card);
-            position: relative; overflow: hidden; margin-bottom: 18px;
-            cursor: pointer;
-            box-shadow: 0 4px 25px var(--shadow);
-        }
-        .upload-zone::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(135deg, rgba(0, 212, 116, 0.08), rgba(42, 122, 85, 0.08));
-            opacity: 0; transition: opacity 0.3s; pointer-events: none;
-        }
-        .upload-zone:hover, .upload-zone.dragover {
-            border-color: var(--highlight); 
-            box-shadow: 0 0 35px var(--glow), 0 8px 30px var(--shadow);
-            transform: translateY(-3px);
-        }
-        .upload-zone:hover::before, .upload-zone.dragover::before { opacity: 1; }
-        .upload-zone:active { transform: translateY(-1px); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         
-        .upload-icon { 
-            font-size: 4rem; margin-bottom: 14px; display: block; 
-            animation: bounce 2.2s infinite; 
-            text-shadow: 0 0 20px var(--glow-green);
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0) scale(1); }
-            50% { transform: translateY(-14px) scale(1.05); }
-        }
-        .upload-zone h3 { font-size: 1.35rem; margin-bottom: 7px; font-weight: 700; }
-        .upload-zone p { color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 10px; line-height: 1.4; }
+        .upload-zone { border: 2px dashed var(--border); border-radius: 20px; padding: 45px 25px; text-align: center; cursor: pointer; transition: all 0.3s ease; background: var(--bg-card); position: relative; overflow: hidden; }
+        .upload-zone:hover, .upload-zone.dragover { border-color: var(--highlight); box-shadow: 0 0 30px var(--glow); }
+        .upload-icon { font-size: 4rem; margin-bottom: 15px; display: block; }
+        .upload-zone h3 { font-size: 1.3rem; margin-bottom: 8px; }
+        .upload-zone p { color: var(--text-secondary); font-size: 0.9rem; }
         .upload-zone input[type="file"] { display: none; }
-        .upload-hint {
-            font-size: 0.82rem; color: var(--text-secondary);
-            background: var(--bg-input); padding: 7px 14px; border-radius: 14px;
-            display: inline-block; margin-top: 10px; font-weight: 500;
-            border: 1px solid var(--border);
-        }
-        .click-hint {
-            display: block; margin-top: 12px; font-size: 0.85rem;
-            color: var(--highlight); font-weight: 600;
-            animation: pulse-text 2s infinite;
-        }
-        @keyframes pulse-text { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
-
-        /* ===== FILE PREVIEW ===== */
-        .file-preview {
-            margin: 18px 0; background: var(--bg-input);
-            border-radius: 18px; padding: 18px; display: none;
-            border: 1px solid var(--border);
-            box-shadow: 0 4px 20px var(--shadow);
-        }
-        .file-preview.show { display: block; animation: fadeIn 0.35s ease; }
-        .file-info { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
-        .file-icon {
-            width: 48px; height: 48px; border-radius: 14px;
-            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.4rem; flex-shrink: 0;
-            box-shadow: 0 3px 15px var(--glow);
-        }
+        
+        .file-preview { margin-top: 20px; background: var(--bg-input); border-radius: 16px; padding: 20px; display: none; border: 1px solid var(--border); }
+        .file-preview.show { display: block; animation: fadeIn 0.3s ease; }
+        .file-info { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; }
+        .file-icon { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--highlight), var(--accent-light)); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; }
         .file-details { flex: 1; min-width: 0; }
-        .file-name { font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .file-size { color: var(--text-secondary); font-size: 0.82rem; margin-top: 3px; }
-        .file-type-badge {
-            background: var(--accent); color: white; padding: 4px 12px;
-            border-radius: 22px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .remove-file {
-            background: rgba(0, 212, 116, 0.15); border: 1px solid var(--border); color: var(--highlight);
-            width: 36px; height: 36px; border-radius: 50%; cursor: pointer;
-            font-size: 1.2rem; transition: all 0.25s; flex-shrink: 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .remove-file:hover { 
-            background: var(--highlight); color: #052015; 
-            transform: scale(1.12) rotate(90deg); 
-            box-shadow: 0 4px 15px var(--glow-green);
-        }
-
-        /* ===== UPLOAD BUTTON WITH URGING ANIMATION ===== */
-        .upload-btn {
-            width: 100%; padding: 16px; border: none; border-radius: 16px;
-            font-size: 1.05rem; font-weight: 800; cursor: pointer;
-            transition: all 0.25s ease; margin: 18px 0;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            background: linear-gradient(135deg, var(--highlight), var(--success));
-            color: #052015; box-shadow: 0 5px 25px var(--glow-green);
-            opacity: 0.55; pointer-events: none; position: relative;
-            overflow: hidden; font-weight: 700;
-        }
-        .upload-btn::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent);
-            transform: translateX(-100%); transition: transform 0.6s;
-        }
-        .upload-btn:hover::before { transform: translateX(100%); }
+        .file-name { font-weight: 600; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .file-size { color: var(--text-secondary); font-size: 0.85rem; margin-top: 2px; }
+        .file-type-badge { background: var(--accent); color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; }
+        .remove-file { background: rgba(233, 69, 96, 0.2); border: none; color: var(--highlight); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; font-size: 1.2rem; transition: all 0.3s; flex-shrink: 0; }
+        .remove-file:hover { background: var(--highlight); color: white; }
+        
+        .upload-btn { width: 100%; padding: 16px; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; margin-top: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, var(--highlight), var(--accent-light)); color: white; box-shadow: 0 4px 20px var(--glow); opacity: 0.5; pointer-events: none; }
         .upload-btn.ready { opacity: 1; pointer-events: all; }
-        .upload-btn.ready:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 8px 35px var(--glow-green);
-            background: linear-gradient(135deg, #00e585, #00d97a);
-        }
-        .upload-btn:active { transform: translateY(-1px); }
-        .upload-btn:disabled { opacity: 0.5; pointer-events: none; }
-        .upload-btn.urge {
-            animation: urgePulse 1.6s infinite, urgeShake 3s infinite;
-            box-shadow: 0 0 0 0 var(--pulse), 0 5px 25px var(--glow-green);
-            background: linear-gradient(135deg, var(--warning), var(--highlight));
-            color: #1a1a2e;
-        }
-        @keyframes urgePulse {
-            0% { box-shadow: 0 0 0 0 var(--pulse); }
-            60% { box-shadow: 0 0 0 18px transparent; }
-            100% { box-shadow: 0 0 0 0 transparent; }
-        }
-        @keyframes urgeShake {
-            0%, 100% { transform: translateX(0); }
-            8%, 24% { transform: translateX(-4px); }
-            16%, 32% { transform: translateX(4px); }
-        }
-
-        /* ===== PROGRESS BAR ===== */
-        .progress-container { margin: 18px 0; display: none; }
+        .upload-btn.ready:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--glow); }
+        .upload-btn:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+        
+        .progress-container { margin-top: 20px; display: none; }
         .progress-container.show { display: block; }
-        .progress-label { display: flex; justify-content: space-between; margin-bottom: 7px; font-size: 0.87rem; color: var(--text-secondary); font-weight: 500; }
-        .progress-bar-bg { height: 8px; background: var(--bg-input); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
-        .progress-bar-fill {
-            height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success));
-            border-radius: 12px; width: 0%; transition: width 0.35s ease;
-            position: relative; box-shadow: 0 0 15px var(--glow-green);
-        }
-        .progress-bar-fill::after {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
-            animation: shine 1.8s infinite;
-        }
-        @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
-
-        /* ===== RESULT / DOWNLOAD SECTION ===== */
-        .result-box {
-            margin: 22px 0; background: var(--bg-card); border-radius: 18px;
-            padding: 22px; display: none; border: 2px solid var(--success);
-            box-shadow: 0 0 35px var(--glow-green), 0 8px 30px var(--shadow); 
-            position: relative; overflow: hidden;
-        }
-        .result-box.show { display: block; animation: fadeIn 0.45s ease; }
-        .result-box::before {
-            content: ''; position: absolute; inset: -50%;
-            background: radial-gradient(circle, rgba(0,232,132,0.12) 0%, transparent 65%);
-            animation: rotate 6s linear infinite; pointer-events: none;
-        }
-        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        .progress-label { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; color: var(--text-secondary); }
+        .progress-bar-bg { height: 8px; background: var(--bg-input); border-radius: 10px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success)); border-radius: 10px; width: 0%; transition: width 0.3s ease; }
         
-        .result-header { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; position: relative; z-index: 1; }
-        .result-header .check-icon {
-            width: 42px; height: 42px; border-radius: 50%; background: var(--success);
-            display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
-            animation: pop 0.5s ease-out; box-shadow: 0 4px 20px var(--glow-green);
-        }
-        @keyframes pop {
-            0% { transform: scale(0.4); opacity: 0.6; }
-            60% { transform: scale(1.2); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .result-header h3 { color: var(--success); font-size: 1.25rem; position: relative; z-index: 1; font-weight: 800; }
+        .result-box { margin-top: 20px; background: var(--bg-card); border-radius: 16px; padding: 25px; display: none; border: 1px solid var(--success); box-shadow: 0 0 30px var(--glow-green); }
+        .result-box.show { display: block; animation: fadeIn 0.4s ease; }
+        .result-header { display: flex; align-items: center; gap: 10px; margin-bottom: 15px; }
+        .result-header .check-icon { width: 40px; height: 40px; border-radius: 50%; background: var(--success); display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+        .result-header h3 { color: var(--success); font-size: 1.2rem; }
         
-        .unique-id-box {
-            background: var(--bg-input); border-radius: 14px; padding: 16px;
-            text-align: center; border: 1px solid var(--border); margin: 14px 0;
-            position: relative; z-index: 1; box-shadow: inset 0 2px 10px rgba(0,0,0,0.2);
-        }
-        .unique-id-box label { color: var(--text-secondary); font-size: 0.82rem; display: block; margin-bottom: 8px; font-weight: 500; }
-        .unique-id {
-            font-size: 1.6rem; font-weight: 800; font-family: 'Courier New', monospace;
-            letter-spacing: 3px; color: var(--highlight); user-select: all;
-            position: relative; z-index: 1; text-shadow: 0 0 15px var(--glow);
-            background: rgba(0, 30, 20, 0.6); padding: 8px 16px; border-radius: 10px;
-            display: inline-block; border: 1px solid var(--border);
-        }
-        
-        .download-link-container {
-            background: var(--bg-input); border-radius: 14px; padding: 16px;
-            display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0;
-            border: 1px solid var(--border); position: relative; z-index: 1;
-        }
-        .download-link {
-            flex: 1; min-width: 220px; color: var(--text-primary);
-            font-size: 0.82rem; word-break: break-all; font-family: 'Courier New', monospace;
-            background: rgba(26, 74, 48, 0.7); padding: 8px 12px; border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-        .action-btns { display: flex; flex-wrap: wrap; gap: 8px; width: 100%; margin-top: 10px; }
-        .copy-btn, .share-btn, .qr-btn, .download-btn {
-            padding: 10px 16px; border: none; border-radius: 12px;
-            font-size: 0.83rem; font-weight: 700; cursor: pointer;
-            transition: all 0.25s; display: flex; align-items: center; gap: 6px;
-            white-space: nowrap; flex: 1; min-width: 85px; justify-content: center;
-            box-shadow: 0 3px 12px var(--shadow);
-        }
+        .download-link-container { background: var(--bg-input); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 10px; margin-bottom: 15px; border: 1px solid var(--border); flex-wrap: wrap; }
+        .download-link { flex: 1; min-width: 200px; color: var(--text-primary); font-size: 0.85rem; word-break: break-all; font-family: 'Courier New', monospace; }
+        .copy-btn, .share-btn, .qr-btn { padding: 10px 18px; border: none; border-radius: 10px; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 6px; white-space: nowrap; }
         .copy-btn { background: var(--accent); color: white; }
-        .copy-btn:hover { background: var(--accent-light); transform: translateY(-2px); box-shadow: 0 5px 18px var(--glow); }
-        .share-btn { background: var(--success); color: #052015; }
-        .share-btn:hover { background: #00f090; transform: translateY(-2px); box-shadow: 0 5px 18px var(--glow-green); }
-        .qr-btn { background: var(--warning); color: #1a1a2e; }
-        .qr-btn:hover { background: #ffe080; transform: translateY(-2px); }
-        .download-btn {
-            background: linear-gradient(135deg, var(--success), #00c970);
-            color: #052015; font-weight: 800; flex: 2.5;
-            box-shadow: 0 4px 20px var(--glow-green);
-        }
-        .download-btn:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 7px 30px var(--glow-green);
-            background: linear-gradient(135deg, #00f090, #00d980);
-        }
+        .copy-btn:hover { background: var(--accent-light); }
+        .share-btn { background: var(--success); color: #000; }
+        .share-btn:hover { background: #00e87e; }
+        .qr-btn { background: var(--warning); color: #000; }
+        .qr-btn:hover { background: #ffb732; }
         
-        .result-note {
-            color: var(--text-secondary); font-size: 0.83rem;
-            text-align: center; margin-top: 14px; line-height: 1.5;
-            position: relative; z-index: 1; font-weight: 500;
-        }
-        .expiry-note {
-            display: inline-block; background: rgba(255, 212, 96, 0.18);
-            color: var(--warning); padding: 4px 10px; border-radius: 8px;
-            font-size: 0.78rem; margin-top: 6px; font-weight: 600;
-            border: 1px solid rgba(255, 212, 96, 0.3);
-        }
-        .security-note {
-            display: block; margin-top: 10px; font-size: 0.8rem;
-            color: var(--success); font-weight: 600; text-align: center;
-            background: rgba(0, 50, 30, 0.4); padding: 6px 12px; border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        /* ===== DOWNLOAD TAB ===== */
-        .download-section {
-            background: var(--bg-card); border-radius: 22px;
-            padding: 26px; border: 1px solid var(--border);
-            box-shadow: 0 5px 30px var(--shadow);
-        }
-        .download-section h3 { font-size: 1.3rem; margin-bottom: 8px; text-align: center; font-weight: 800; }
-        .download-section > p { color: var(--text-secondary); text-align: center; margin-bottom: 22px; font-size: 0.93rem; }
-        .input-group { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; }
-        .input-group input {
-            flex: 1; min-width: 160px; padding: 14px 18px; border: 2px solid var(--border);
-            border-radius: 14px; background: var(--bg-input); color: var(--text-primary);
-            font-size: 1rem; font-family: 'Courier New', monospace;
-            letter-spacing: 1.5px; transition: all 0.25s; outline: none;
-            font-weight: 600;
-        }
-        .input-group input:focus { 
-            border-color: var(--highlight); 
-            box-shadow: 0 0 0 4px var(--pulse);
-        }
-        .input-group input::placeholder { 
-            color: var(--text-secondary); letter-spacing: 0; 
-            font-family: -apple-system, sans-serif; font-weight: normal;
-        }
-        .fetch-btn {
-            padding: 14px 24px; border: none; border-radius: 14px;
-            background: linear-gradient(135deg, var(--success), #00c970);
-            color: #052015; font-weight: 800; font-size: 1rem;
-            cursor: pointer; transition: all 0.25s; white-space: nowrap;
-            display: flex; align-items: center; gap: 8px;
+        /* ✅ NEW: Download File Now Button */
+        .download-now-btn {
+            width: 100%;
+            padding: 16px 20px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--success), #00b368);
+            color: #000;
             box-shadow: 0 4px 20px var(--glow-green);
-            min-width: 130px; justify-content: center;
         }
-        .fetch-btn:hover { 
-            transform: translateY(-3px); 
-            box-shadow: 0 7px 30px var(--glow-green);
-            background: linear-gradient(135deg, #00f090, #00d980);
-        }
-        .fetch-btn:active { transform: translateY(-1px); }
-        .direct-link-section { margin-top: 18px; }
-        .direct-link-section label { color: var(--text-secondary); font-size: 0.87rem; display: block; margin-bottom: 8px; font-weight: 500; }
-        .direct-link-input {
-            width: 100%; padding: 14px 18px; border: 2px solid var(--border);
-            border-radius: 14px; background: var(--bg-input); color: var(--text-primary);
-            font-size: 0.87rem; outline: none; transition: all 0.25s;
-            font-family: 'Courier New', monospace; letter-spacing: 0.5px;
-        }
-        .direct-link-input:focus { border-color: var(--success); box-shadow: 0 0 0 4px var(--pulse); }
-        .go-btn {
-            width: 100%; margin-top: 12px; padding: 14px; border: none;
-            border-radius: 14px; background: linear-gradient(135deg, var(--accent-light), var(--highlight));
-            color: white; font-weight: 800; font-size: 1rem;
-            cursor: pointer; transition: all 0.25s;
-            box-shadow: 0 4px 20px var(--glow);
-        }
-        .go-btn:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--glow); }
-        .go-btn:active { transform: translateY(-1px); }
-        .how-it-works {
-            margin-top: 22px; padding: 18px; background: var(--bg-input);
-            border-radius: 14px; border: 1px solid var(--border);
-            font-size: 0.87rem; box-shadow: inset 0 2px 10px rgba(0,0,0,0.15);
-        }
-        .how-it-works h4 { 
-            margin-bottom: 10px; font-size: 0.98rem; 
-            display: flex; align-items: center; gap: 7px; font-weight: 700; color: var(--success);
-        }
-        .how-it-works ol { color: var(--text-secondary); font-size: 0.87rem; line-height: 1.8; padding-left: 22px; }
-        .how-it-works li { margin-bottom: 4px; }
-        .local-network-tip {
-            background: rgba(0, 40, 25, 0.5); border-left: 4px solid var(--success);
-            padding: 12px 16px; border-radius: 0 10px 10px 0; margin: 14px 0;
-            font-size: 0.85rem; font-weight: 500;
-        }
-        .security-highlight {
-            background: rgba(0, 50, 30, 0.7); border: 1px solid var(--success);
-            padding: 12px 16px; border-radius: 10px; margin: 14px 0;
-            font-size: 0.85rem; color: var(--success); font-weight: 600;
-        }
-
-        /* ===== HISTORY ===== */
-        .history-section { margin-top: 26px; }
-        .history-section h3 { font-size: 1.15rem; margin-bottom: 14px; display: flex; align-items: center; gap: 9px; font-weight: 800; }
+        .download-now-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--glow-green); }
+        .download-now-btn:active { transform: translateY(0); }
+        
+        .unique-id-box { background: var(--bg-input); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid var(--border); }
+        .unique-id-box label { color: var(--text-secondary); font-size: 0.85rem; display: block; margin-bottom: 8px; }
+        .unique-id { font-size: 1.5rem; font-weight: 800; font-family: 'Courier New', monospace; letter-spacing: 3px; color: var(--highlight); user-select: all; }
+        
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.85); z-index: 1000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(10px); padding: 20px; }
+        .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+        .modal { background: var(--bg-card); border-radius: 20px; padding: 30px; text-align: center; max-width: 350px; width: 100%; border: 1px solid var(--border); }
+        .modal h3 { margin-bottom: 20px; font-size: 1.2rem; }
+        .modal canvas { border-radius: 12px; margin-bottom: 20px; max-width: 100%; height: auto; }
+        .modal-close { padding: 12px 30px; border: none; border-radius: 10px; background: var(--highlight); color: white; font-weight: 600; cursor: pointer; font-size: 0.95rem; transition: all 0.3s; }
+        .modal-close:hover { background: #ff5a75; }
+        
+        .download-section { background: var(--bg-card); border-radius: 20px; padding: 30px; border: 1px solid var(--border); }
+        .download-section h3 { font-size: 1.3rem; margin-bottom: 8px; text-align: center; }
+        .download-section > p { color: var(--text-secondary); text-align: center; margin-bottom: 25px; font-size: 0.9rem; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .input-group input { flex: 1; min-width: 150px; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 1rem; font-family: 'Courier New', monospace; letter-spacing: 2px; transition: border-color 0.3s; outline: none; }
+        .input-group input:focus { border-color: var(--highlight); }
+        .input-group input::placeholder { color: var(--text-secondary); letter-spacing: 0; font-family: 'Segoe UI', sans-serif; }
+        .fetch-btn { padding: 14px 28px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--success), #00b368); color: #000; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .fetch-btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px var(--glow-green); }
+        
+        .direct-link-section { margin-top: 15px; }
+        .direct-link-section label { color: var(--text-secondary); font-size: 0.85rem; display: block; margin-bottom: 8px; }
+        .direct-link-input { width: 100%; padding: 14px 18px; border: 2px solid var(--border); border-radius: 12px; background: var(--bg-input); color: var(--text-primary); font-size: 0.85rem; outline: none; transition: border-color 0.3s; }
+        .direct-link-input:focus { border-color: var(--success); }
+        .go-btn { width: 100%; margin-top: 12px; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(135deg, var(--accent-light), var(--highlight)); color: white; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.3s; }
+        .go-btn:hover { transform: translateY(-2px); }
+        
+        .history-section { margin-top: 30px; }
+        .history-section h3 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
         .history-list { display: flex; flex-direction: column; gap: 10px; }
-        .history-item {
-            background: var(--bg-card); border-radius: 14px; padding: 14px 18px;
-            display: flex; align-items: center; gap: 14px;
-            border: 1px solid var(--border); transition: all 0.25s;
-            box-shadow: 0 3px 15px var(--shadow);
-        }
-        .history-item:hover { 
-            border-color: var(--accent-light); 
-            transform: translateX(5px);
-            box-shadow: 0 5px 25px var(--glow);
-        }
+        .history-item { background: var(--bg-card); border-radius: 12px; padding: 15px; display: flex; align-items: center; gap: 12px; border: 1px solid var(--border); transition: all 0.3s; }
+        .history-item:hover { border-color: var(--accent-light); }
         .history-item .file-icon { width: 40px; height: 40px; font-size: 1.1rem; }
         .history-details { flex: 1; min-width: 0; }
-        .history-name { font-weight: 700; font-size: 0.93rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .history-meta { 
-            color: var(--text-secondary); font-size: 0.77rem; margin-top: 3px; 
-            display: flex; flex-wrap: wrap; gap: 5px; font-weight: 500;
-        }
-        .history-actions { display: flex; gap: 6px; }
-        .history-copy, .history-delete {
-            padding: 7px 12px; border: none; border-radius: 10px;
-            font-size: 0.78rem; cursor: pointer; transition: all 0.25s;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 600; min-width: 36px;
-        }
-        .history-copy { background: var(--accent); color: white; }
-        .history-copy:hover { background: var(--accent-light); transform: translateY(-2px); }
-        .history-delete {
-            background: rgba(0, 212, 116, 0.15); color: var(--highlight);
-            border: 1px solid var(--border);
-        }
-        .history-delete:hover { 
-            background: var(--highlight); color: #052015; 
-            transform: translateY(-2px); 
-            box-shadow: 0 4px 15px var(--glow-green);
-        }
-        .clear-history {
-            margin-top: 14px; padding: 9px 18px; border: 1px solid var(--highlight);
-            border-radius: 12px; background: transparent; color: var(--highlight);
-            font-weight: 700; cursor: pointer; transition: all 0.25s; font-size: 0.82rem;
-            display: flex; align-items: center; gap: 6px; margin-left: auto;
-            box-shadow: 0 3px 12px var(--shadow);
-        }
-        .clear-history:hover { 
-            background: var(--highlight); color: #052015; 
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px var(--glow-green);
-        }
-        .empty-history { 
-            text-align: center; color: var(--text-secondary); padding: 28px; 
-            font-size: 0.93rem; font-weight: 500; 
-        }
-
-        /* ===== TOAST NOTIFICATION ===== */
-        .toast {
-            position: fixed; bottom: 26px; left: 50%;
-            transform: translateX(-50%) translateY(100px);
-            background: var(--bg-card); color: var(--text-primary);
-            padding: 14px 26px; border-radius: 14px; font-weight: 700;
-            font-size: 0.93rem; z-index: 2000; transition: transform 0.35s ease;
-            border: 1px solid var(--border);
-            box-shadow: 0 10px 40px var(--shadow), 0 0 25px var(--glow);
-            display: flex; align-items: center; gap: 10px;
-            max-width: 92%; text-align: center;
-            backdrop-filter: blur(10px);
-        }
+        .history-name { font-weight: 600; font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .history-meta { color: var(--text-secondary); font-size: 0.78rem; margin-top: 2px; }
+        .history-copy { padding: 8px 14px; border: none; border-radius: 8px; background: var(--accent); color: white; font-size: 0.8rem; cursor: pointer; transition: all 0.3s; white-space: nowrap; }
+        .history-copy:hover { background: var(--accent-light); }
+        .history-delete { padding: 8px 10px; border: none; border-radius: 8px; background: rgba(233, 69, 96, 0.2); color: var(--highlight); font-size: 0.9rem; cursor: pointer; transition: all 0.3s; }
+        .history-delete:hover { background: var(--highlight); color: white; }
+        .clear-history { margin-top: 15px; padding: 10px 20px; border: 1px solid var(--highlight); border-radius: 10px; background: transparent; color: var(--highlight); font-weight: 600; cursor: pointer; transition: all 0.3s; font-size: 0.85rem; }
+        .clear-history:hover { background: var(--highlight); color: white; }
+        .empty-history { text-align: center; color: var(--text-secondary); padding: 30px; font-size: 0.9rem; }
+        
+        .toast { position: fixed; bottom: calc(20px + var(--safe-area-bottom)); left: 50%; transform: translateX(-50%) translateY(100px); background: var(--bg-card); color: var(--text-primary); padding: 14px 28px; border-radius: 12px; font-weight: 600; font-size: 0.95rem; z-index: 2000; transition: transform 0.4s ease; border: 1px solid var(--border); box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5); display: flex; align-items: center; gap: 10px; max-width: 90%; text-align: center; }
         .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.success { 
-            border-color: var(--success); 
-            background: rgba(10, 40, 25, 0.95);
-            box-shadow: 0 10px 40px var(--shadow), 0 0 30px var(--glow-green);
-        }
-        .toast.error { 
-            border-color: var(--warning); 
-            background: rgba(40, 30, 15, 0.95);
-            box-shadow: 0 10px 40px var(--shadow), 0 0 30px rgba(255, 212, 96, 0.3);
-        }
-        .toast.urge { 
-            border-color: var(--warning); 
-            animation: toastShake 0.6s; 
-            background: rgba(40, 35, 15, 0.95);
-            box-shadow: 0 10px 40px var(--shadow), 0 0 30px rgba(255, 212, 96, 0.4);
-        }
-        @keyframes toastShake {
-            0%, 100% { transform: translateX(-50%) translateY(0); }
-            20%, 60% { transform: translateX(-52%) translateY(0); }
-            40%, 80% { transform: translateX(-48%) translateY(0); }
-        }
-
-        /* ===== FOOTER ===== */
-        footer {
-            text-align: center; padding: 26px 0 18px; margin-top: auto;
-            color: var(--text-secondary); font-size: 0.78rem;
-            border-top: 1px solid var(--border); margin-top: 22px;
-        }
-        .footer-note {
-            display: inline-block; background: rgba(0, 40, 25, 0.6);
-            padding: 5px 12px; border-radius: 10px; margin-top: 6px;
-            font-weight: 500; border: 1px solid var(--border);
-        }
-        .security-footer {
-            display: block; margin-top: 8px; font-size: 0.75rem;
-            color: var(--success); font-weight: 600;
-        }
-
-        /* ===== QR CODE MODAL ===== */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(5, 25, 15, 0.92); z-index: 1000;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(8px); padding: 20px;
-            animation: fadeIn 0.3s ease;
-        }
-        .modal-overlay.show { display: flex; }
-        .modal {
-            background: var(--bg-card); border-radius: 22px; padding: 26px;
-            text-align: center; max-width: 340px; width: 100%;
-            border: 2px solid var(--success); position: relative;
-            box-shadow: 0 15px 50px var(--shadow), 0 0 40px var(--glow-green);
-            animation: modalPop 0.4s ease-out;
-        }
-        @keyframes modalPop {
-            0% { transform: scale(0.9); opacity: 0.7; }
-            70% { transform: scale(1.03); }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .modal h3 { margin-bottom: 18px; font-size: 1.2rem; font-weight: 800; color: var(--success); }
-        .modal .qr-container {
-            background: white; border-radius: 14px; padding: 14px;
-            margin: 0 auto 18px; width: fit-content;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
-            border: 3px solid var(--border);
-        }
-        .modal canvas { border-radius: 10px; display: block; }
-        .modal-close {
-            padding: 11px 26px; border: none; border-radius: 12px;
-            background: linear-gradient(135deg, var(--highlight), var(--success)); 
-            color: #052015; font-weight: 800;
-            cursor: pointer; font-size: 0.93rem; transition: all 0.25s;
-            display: inline-flex; align-items: center; gap: 7px;
-            box-shadow: 0 4px 20px var(--glow-green);
-        }
-        .modal-close:hover { 
-            transform: translateY(-2px); 
-            box-shadow: 0 7px 30px var(--glow-green);
-            background: linear-gradient(135deg, #00e585, #00d97a);
-        }
-        .qr-instruction {
-            font-size: 0.87rem; color: var(--text-secondary);
-            margin-top: 14px; line-height: 1.5; font-weight: 500;
-        }
-
-        /* ===== LOADING SPINNER ===== */
-        .spinner {
-            display: inline-block; width: 20px; height: 20px;
-            border: 3px solid rgba(240, 255, 248, 0.3);
-            border-top-color: var(--success); border-radius: 50%;
-            animation: spin 0.9s linear infinite;
-        }
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--highlight); }
+        
+        footer { text-align: center; padding: 30px 0 20px; margin-top: auto; color: var(--text-secondary); font-size: 0.8rem; }
+        footer a { color: var(--highlight); text-decoration: none; }
+        
+        .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* ===== FILE TYPE ICONS - GREEN THEME ===== */
-        .icon-image { background: linear-gradient(135deg, #00d474, #00e884) !important; }
-        .icon-video { background: linear-gradient(135deg, #00c970, #00d97a) !important; }
-        .icon-audio { background: linear-gradient(135deg, #00e080, #00f090) !important; }
-        .icon-pdf { background: linear-gradient(135deg, #00b368, #00c970) !important; }
-        .icon-zip { background: linear-gradient(135deg, #00a660, #00b368) !important; }
-        .icon-doc { background: linear-gradient(135deg, #009958, #00a660) !important; }
-        .icon-code { background: linear-gradient(135deg, #00cc74, #00d97a) !important; }
-        .icon-other { background: linear-gradient(135deg, #2a5a40, #3a6a50) !important; }
-
-        /* ===== ANIMATION UTILITIES ===== */
-        .shake { animation: shake 0.5s; }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-6px); }
-            40%, 80% { transform: translateX(6px); }
-        }
-        .bounce { animation: bounce 0.7s; }
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
-            40% {transform: translateY(-25px);}
-            60% {transform: translateY(-12px);}
-        }
-        .pulse { animation: pulse 1.6s infinite; }
-        .fade-in { animation: fadeIn 0.4s ease; }
-
-        /* ===== DOWNLOAD BUTTON - PROMINENT ===== */
-        .download-btn-now {
-            width: 100%; padding: 18px; border: none; border-radius: 16px;
-            font-size: 1.15rem; font-weight: 800; cursor: pointer;
-            transition: all 0.3s ease; margin: 20px 0;
-            display: flex; align-items: center; justify-content: center; gap: 12px;
-            background: linear-gradient(135deg, var(--success), #00c970);
-            color: #052015; box-shadow: 0 6px 30px var(--glow-green);
-            position: relative; overflow: hidden;
-            font-weight: 800; letter-spacing: 0.5px;
-        }
-        .download-btn-now::before {
-            content: ''; position: absolute; inset: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: translateX(-100%); transition: transform 0.7s;
-        }
-        .download-btn-now:hover::before { transform: translateX(100%); }
-        .download-btn-now:hover { 
-            transform: translateY(-4px); 
-            box-shadow: 0 10px 45px var(--glow-green);
-            background: linear-gradient(135deg, #00f090, #00d980);
-        }
-        .download-btn-now:active { transform: translateY(-2px); }
-        .download-btn-now:disabled { 
-            opacity: 0.6; pointer-events: none; 
-            transform: none; box-shadow: 0 4px 20px var(--shadow);
-        }
-        .download-ready {
-            animation: pulse-glow 2s infinite;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { box-shadow: 0 6px 30px var(--glow-green); }
-            50% { box-shadow: 0 6px 45px var(--glow-green), 0 0 60px var(--glow-green); }
-        }
-
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 620px) {
-            header h1 { font-size: 1.85rem; }
-            .logo { font-size: 2.8rem; }
-            .upload-zone { padding: 36px 22px; }
-            .upload-icon { font-size: 3.4rem; }
-            .download-link-container { flex-direction: column; }
+        
+        /* ===== MOBILE OPTIMIZATIONS ===== */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.6rem; } 
+            .logo { font-size: 2.5rem; }
+            .upload-zone { padding: 35px 20px; } 
+            .upload-icon { font-size: 3rem; }
+            .download-link-container { flex-direction: column; align-items: stretch; }
+            .download-link { min-width: auto; text-align: center; }
+            .copy-btn, .share-btn, .qr-btn { justify-content: center; }
             .input-group { flex-direction: column; }
-            .unique-id { font-size: 1.35rem; letter-spacing: 2px; }
-            .tab-btn { font-size: 0.83rem; padding: 11px 10px; }
+            .unique-id { font-size: 1.2rem; letter-spacing: 2px; }
+            .tab-btn { font-size: 0.85rem; padding: 12px 10px; }
             .result-box { padding: 18px; }
-            .action-btns { flex-direction: column; }
-            .copy-btn, .share-btn, .qr-btn, .download-btn { width: 100%; min-width: 100%; }
-            .config-panel { flex-direction: column; align-items: flex-start; }
-            .storage-info { margin-left: 0; margin-top: 6px; width: 100%; justify-content: center; }
-            .download-btn-now { padding: 16px; font-size: 1.05rem; }
-            .file-info { flex-direction: column; align-items: flex-start; }
-            .file-actions { width: 100%; display: flex; justify-content: flex-end; margin-top: 8px; }
-        }
-
-        /* ===== INSTALL PROMPT ===== */
-        .install-prompt {
-            position: fixed; bottom: 18px; right: 18px;
-            background: var(--bg-card); border: 2px solid var(--success);
-            border-radius: 18px; padding: 18px; max-width: 290px;
-            box-shadow: 0 10px 40px var(--shadow), 0 0 30px var(--glow-green); 
-            z-index: 1500; display: none; animation: slideIn 0.35s ease;
-            backdrop-filter: blur(10px);
-        }
-        .install-prompt.show { display: block; }
-        @keyframes slideIn {
-            from { transform: translateX(120px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .install-prompt h4 { margin-bottom: 10px; font-size: 1.05rem; display: flex; align-items: center; gap: 7px; font-weight: 800; color: var(--success); }
-        .install-prompt p { color: var(--text-secondary); font-size: 0.87rem; margin-bottom: 14px; line-height: 1.4; }
-        .install-btn {
-            width: 100%; padding: 11px; border: none; border-radius: 12px;
-            background: linear-gradient(135deg, var(--accent-light), var(--highlight));
-            color: white; font-weight: 700; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 7px;
-            font-size: 0.9rem; box-shadow: 0 4px 18px var(--glow);
-        }
-        .install-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 25px var(--glow); }
-        .install-close {
-            position: absolute; top: 10px; right: 12px;
-            background: none; border: none; color: var(--text-secondary);
-            font-size: 1.4rem; cursor: pointer; padding: 4px;
-            transition: all 0.2s;
-        }
-        .install-close:hover { color: var(--highlight); transform: scale(1.2); }
-
-        /* ===== MEDIA PREVIEWS ===== */
-        .media-preview {
-            margin-top: 16px; border-radius: 14px; overflow: hidden;
-            max-height: 280px; display: none; border: 1px solid var(--border);
-            background: var(--bg-input);
-        }
-        .media-preview.show { display: block; animation: fadeIn 0.35s ease; }
-        .media-preview img, .media-preview video {
-            width: 100%; max-height: 280px; object-fit: contain;
-            background: var(--bg-secondary); display: block;
-        }
-        .media-preview audio {
-            width: 100%; padding: 12px; display: block;
-            background: var(--bg-secondary); border-radius: 10px;
+            .modal { padding: 25px 20px; }
+            .config-row { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .config-row label { min-width: auto; }
+            .config-row input, .config-row select { width: 100%; min-width: auto; }
         }
         
-        /* ===== UTILITY CLASSES ===== */
-        .hidden { display: none !important; }
-        .text-center { text-align: center; }
-        .mt-10 { margin-top: 10px; }
-        .mb-10 { margin-bottom: 10px; }
-        .fw-600 { font-weight: 600; }
-        .text-success { color: var(--success); }
-        .text-warning { color: var(--warning); }
+        /* File type icons */
+        .icon-image { background: linear-gradient(135deg, #e94560, #ff6b81) !important; }
+        .icon-video { background: linear-gradient(135deg, #533483, #8854d0) !important; }
+        .icon-audio { background: linear-gradient(135deg, #ffa502, #ff6348) !important; }
+        .icon-pdf { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
+        .icon-zip { background: linear-gradient(135deg, #f39c12, #e67e22) !important; }
+        .icon-doc { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
+        .icon-code { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; }
+        .icon-other { background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important; }
         
-        /* ===== PRINT STYLES ===== */
-        @media print {
-            .bg-animation, .tabs, .upload-zone, .config-panel, footer, .toast, .install-prompt {
-                display: none !important;
+        .config-panel { background: var(--bg-card); border-radius: 16px; padding: 20px; margin-bottom: 20px; border: 1px solid var(--border); }
+        .config-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+        .config-row label { color: var(--text-secondary); font-size: 0.9rem; min-width: 100px; }
+        .config-row input, .config-row select { flex: 1; min-width: 200px; padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-input); color: var(--text-primary); font-size: 0.9rem; }
+        .config-row input:focus, .config-row select:focus { outline: none; border-color: var(--highlight); }
+        .save-config-btn { padding: 10px 24px; background: var(--success); color: #000; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .save-config-btn:hover { background: #00e87e; }
+        
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; }
+        .status-online { background: var(--success); box-shadow: 0 0 10px var(--glow-green); }
+        .status-offline { background: var(--highlight); box-shadow: 0 0 10px var(--glow); }
+        
+        /* iOS specific tweaks */
+        @supports (-webkit-touch-callout: none) {
+            .upload-btn, .download-now-btn, .fetch-btn, .go-btn, .tab-btn {
+                -webkit-appearance: none;
             }
-            .container { max-width: 100%; padding: 0; }
-            .result-box { display: block !important; border: 2px solid var(--success); }
         }
     </style>
 </head>
 <body>
-    <!-- Animated Green Background -->
     <div class="bg-animation">
-        <div class="circle"></div>
-        <div class="circle"></div>
-        <div class="circle"></div>
+        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
     </div>
 
     <div class="container">
-        <!-- Header -->
         <header>
             <span class="logo">📁</span>
             <h1>PossibilityData</h1>
-            <p>Secure Local Share • No Cloud • 30-Day Storage • Green Theme</p>
-            <div class="device-badge laptop" id="deviceBadge">
-                <span>💚</span> <span id="deviceText">Laptop Backend • Files Stay On Your Device</span>
-            </div>
+            <p>Secure • Private • No 0x0.st • Works for texts, videos, files</p>
         </header>
 
-        <!-- Config Panel -->
+        <!-- 🔧 CONFIG PANEL -->
         <div class="config-panel">
             <div class="config-row">
-                <label>Storage:</label>
-                <select id="storageSelect">
-                    <option value="indexeddb">✅ Local Device Storage (IndexedDB)</option>
-                    <option value="filesystem" id="fsOption" disabled>File System Access (Chrome)</option>
+                <label>Backend:</label>
+                <select id="backendSelect" onchange="updateBackend()">
+                    <option value="tmpfiles">tmpfiles.org (100MB, 60min)</option>
+                    <option value="storage">storage.to (25GB, 3 days)</option>
+                    <option value="custom">Custom / Self-hosted</option>
                 </select>
             </div>
-            <div class="config-row">
-                <label>Expiry:</label>
-                <span style="color: var(--success); font-weight: 600;">30 days auto-cleanup</span>
+            <div class="config-row" id="customUrlRow" style="display:none;">
+                <label>API URL:</label>
+                <input type="url" id="customApiUrl" placeholder="https://your-server.com/api/upload" value="">
             </div>
             <div class="config-row">
                 <label>Status:</label>
-                <span><span class="status-indicator status-online" id="statusDot"></span><span id="statusText">Ready • Secure</span></span>
-                <button class="save-config-btn" onclick="saveConfig(event)">
-                    <span>💾</span> Save Settings
-                </button>
-            </div>
-            <div class="storage-info" id="storageInfo">
-                <span>💾</span> <span id="storageUsed">0 MB</span> used • <span id="storageQuota">Unlimited</span> quota
+                <span><span class="status-indicator status-online" id="statusDot"></span><span id="statusText">Ready</span></span>
+                <button class="save-config-btn" onclick="saveConfig()">💾 Save</button>
             </div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs">
-            <button class="tab-btn active" onclick="switchTab('upload', event)">⬆️ Upload</button>
-            <button class="tab-btn" onclick="switchTab('download', event)">⬇️ Download</button>
-            <button class="tab-btn" onclick="switchTab('history', event)">📋 History</button>
+            <button class="tab-btn active" onclick="switchTab('upload')">⬆️ Upload</button>
+            <button class="tab-btn" onclick="switchTab('download')">⬇️ Download</button>
+            <button class="tab-btn" onclick="switchTab('history')">📋 History</button>
         </div>
 
-        <!-- ===== UPLOAD TAB ===== -->
+        <!-- UPLOAD TAB -->
         <div id="tab-upload" class="tab-content active">
-            <!-- CLICKABLE UPLOAD ZONE - Opens Native File Picker -->
-            <div class="upload-zone" id="dropZone" role="button" tabindex="0" aria-label="Click or drag to select files">
-                <span class="upload-icon">☁️➡️💚</span>
-                <h3>Tap to Select Files or Drag & Drop</h3>
-                <p>Photos • Videos • Music • Documents • Any file type</p>
-                <div class="upload-hint">🔒 Files stored ONLY on your laptop for 30 days</div>
-                <span class="click-hint">👆 Tap anywhere here to open file picker</span>
-                <input type="file" id="fileInput" multiple accept="*/*">
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <span class="upload-icon">☁️</span>
+                <h3>Drag & Drop or Click to Upload</h3>
+                <p>Images, Videos, Documents, Messages — Any file (limits depend on backend)</p>
+                <input type="file" id="fileInput">
             </div>
 
-            <!-- File Preview -->
             <div class="file-preview" id="filePreview">
                 <div class="file-info">
                     <div class="file-icon" id="fileIcon">📄</div>
@@ -900,21 +284,17 @@
                         <div class="file-size" id="fileSize">2.4 MB</div>
                     </div>
                     <span class="file-type-badge" id="fileType">JPG</span>
-                    <button class="remove-file" onclick="removeFile(event)" aria-label="Remove file">✕</button>
+                    <button class="remove-file" onclick="removeFile()">✕</button>
                 </div>
-                <!-- Media Preview Container -->
-                <div class="media-preview" id="mediaPreview"></div>
             </div>
 
-            <!-- Upload Button with Urging Animation -->
-            <button class="upload-btn" id="uploadBtn" onclick="uploadFile(event)">
-                <span class="btn-text">🚀 Save to Laptop & Generate ID</span>
+            <button class="upload-btn" id="uploadBtn" onclick="uploadFile()">
+                🚀 Upload & Generate Link
             </button>
 
-            <!-- Progress -->
             <div class="progress-container" id="progressContainer">
                 <div class="progress-label">
-                    <span id="progressText">Saving to local storage...</span>
+                    <span id="progressText">Uploading...</span>
                     <span id="progressPercent">0%</span>
                 </div>
                 <div class="progress-bar-bg">
@@ -922,587 +302,291 @@
                 </div>
             </div>
 
-            <!-- Result -->
             <div class="result-box" id="resultBox">
                 <div class="result-header">
                     <div class="check-icon">✅</div>
-                    <h3>File Saved Securely to Your Laptop!</h3>
+                    <h3>File Uploaded Successfully!</h3>
                 </div>
-
                 <div class="unique-id-box">
-                    <label>🔑 Your Download ID (Share with Phone)</label>
+                    <label>Your Unique Download ID</label>
                     <div class="unique-id" id="uniqueId">PD-XXXXXX</div>
                 </div>
-
+                <br>
                 <div class="download-link-container">
-                    <span class="download-link" id="downloadLink">possibilitydata://PD-XXXXXX</span>
-                    <div class="action-btns">
-                        <button class="copy-btn" onclick="copyLink(event)">📋 Copy ID</button>
-                        <button class="share-btn" onclick="shareLink(event)">📤 Share</button>
-                        <button class="qr-btn" onclick="showQR(event)">📱 QR Code</button>
-                    </div>
+                    <span class="download-link" id="downloadLink">https://...</span>
+                    <button class="copy-btn" onclick="copyLink()">📋 Copy</button>
+                    <button class="share-btn" onclick="shareLink()">📤 Share</button>
+                    <button class="qr-btn" onclick="showQR()">📱 QR</button>
                 </div>
-
-                <!-- PROMINENT DOWNLOAD BUTTON - Works on Any Device with File -->
-                <button class="download-btn-now download-ready" id="downloadBtnNow" onclick="downloadFileNow(event)">
-                    ⬇️ Download File Now
+                
+                <!-- ✅ NEW: Download File Now Button (Mobile Optimized) -->
+                <button class="download-now-btn" id="downloadNowBtn" onclick="triggerMobileDownload()">
+                    📥 Download File Now
                 </button>
-
-                <p class="result-note">
-                    <strong>On your phone:</strong> Open this same app → Download tab → Enter ID above
-                    <br><span class="expiry-note">⏰ Auto-deletes in 30 days</span>
-                    <br><span class="security-note">🔒 Files NEVER leave your devices • No external servers • No remote access</span>
+                
+                <p style="color: var(--text-secondary); font-size: 0.82rem; text-align: center; margin-top: 15px;">
+                    📱 Open this link on your phone or enter the ID in the <strong>Download</strong> tab
                 </p>
             </div>
         </div>
 
-        <!-- ===== DOWNLOAD TAB ===== -->
+        <!-- DOWNLOAD TAB -->
         <div id="tab-download" class="tab-content">
             <div class="download-section">
-                <h3>📥 Download from Your Laptop</h3>
-                <p>Enter the ID you received from your laptop</p>
-
+                <h3>📥 Download Your File</h3>
+                <p>Enter the Unique ID or paste the full download link</p>
                 <div class="input-group">
-                    <input type="text" id="codeInput" placeholder="e.g. PD-ABC123" oninput="this.value = this.value.toUpperCase()" maxlength="10" autocomplete="off">
-                    <button class="fetch-btn" onclick="fetchById(event)">
-                        <span>🔍</span> Fetch File
-                    </button>
+                    <input type="text" id="codeInput" placeholder="e.g. PD-abc123" oninput="this.value = this.value.toUpperCase()" autocapitalize="characters" autocorrect="off" spellcheck="false">
+                    <button class="fetch-btn" onclick="fetchById()">Fetch</button>
                 </div>
-
                 <div class="direct-link-section">
-                    <label>Or use the local protocol link (advanced):</label>
-                    <input type="text" class="direct-link-input" id="urlInput" placeholder="possibilitydata://PD-XXXXXX">
-                    <button class="go-btn" onclick="fetchByUrl(event)">🚀 Open Download</button>
+                    <label>Or paste the full download URL:</label>
+                    <input type="url" class="direct-link-input" id="urlInput" placeholder="https://..." inputmode="url">
+                    <button class="go-btn" onclick="fetchByUrl()">🚀 Open Download</button>
                 </div>
-
-                <div class="local-network-tip">
-                    <strong>💡 For Cross-Device Transfer:</strong><br>
-                    Both devices must be on the same WiFi network. The laptop stores the file locally, and your phone can download it when connected to the same network.
-                </div>
-                
-                <div class="security-highlight">
-                    🔐 SECURITY: Files are stored ONLY on your laptop's local storage. No one else can access them remotely. Only you can download using the ID.
-                </div>
-
-                <div class="how-it-works">
-                    <h4>🔄 How Secure Local Sharing Works:</h4>
-                    <ol>
-                        <li>Upload file on your <strong>laptop</strong> (this device)</li>
-                        <li>Copy the <strong>Download ID</strong> or scan the QR code</li>
-                        <li>Open this same app on your <strong>phone</strong></li>
-                        <li>Go to <strong>Download</strong> tab and enter the ID</li>
-                        <li>Download your file directly from your laptop! 🎉</li>
+                <div style="margin-top: 25px; padding: 20px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <h4 style="margin-bottom: 10px; font-size: 0.95rem;">💡 How it works:</h4>
+                    <ol style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; padding-left: 20px;">
+                        <li>Upload a file from your laptop on the <strong>Upload</strong> tab</li>
+                        <li>Copy the <strong>Unique ID</strong> or <strong>Download Link</strong></li>
+                        <li>Open this website on your phone</li>
+                        <li>Go to the <strong>Download</strong> tab and paste the ID or link</li>
+                        <li>Download your file! 🎉</li>
                     </ol>
-                    <p style="margin-top:14px;font-size:0.83rem;color:var(--text-secondary);font-weight:500">
-                        <strong>Privacy Guaranteed:</strong> No files are uploaded to any server. Everything stays on your devices.
-                    </p>
                 </div>
             </div>
         </div>
 
-        <!-- ===== HISTORY TAB ===== -->
+        <!-- HISTORY TAB -->
         <div id="tab-history" class="tab-content">
             <div class="history-section">
                 <h3>📋 Upload History</h3>
                 <div class="history-list" id="historyList">
-                    <div class="empty-history">No files uploaded yet. Start by uploading a file to your laptop!</div>
+                    <div class="empty-history">No files uploaded yet. Start by uploading a file!</div>
                 </div>
-                <button class="clear-history" id="clearHistoryBtn" style="display:none;" onclick="clearHistory(event)">
-                    <span>🗑️</span> Clear All History
-                </button>
-                <div class="security-note" style="margin-top:16px">
-                    History is stored locally on this device only. Clearing it won't delete your actual files.
-                </div>
+                <button class="clear-history" id="clearHistoryBtn" style="display:none;" onclick="clearHistory()">🗑️ Clear All History</button>
             </div>
         </div>
 
-        <!-- Footer -->
         <footer>
-            <p>🔒 Files stored ONLY on your devices • No ads • No tracking • No cloud servers</p>
-            <p class="footer-note">PossibilityData © 2026 • Local-First • Green Theme • Privacy Guaranteed</p>
-            <p class="security-footer">⚡ Works Offline • PWA Installable • 30-Day Auto Cleanup • Zero External Dependencies</p>
+            <p>🔒 Files stored per your chosen backend — <strong>no 0x0.st</strong></p>
+            <p style="margin-top: 5px;">PossibilityData © 2026 — Privacy-first, no login, no tracking</p>
         </footer>
     </div>
 
-    <!-- QR Code Modal -->
+    <!-- QR Modal -->
     <div class="modal-overlay" id="qrModal">
         <div class="modal">
             <h3>📱 Scan to Download on Phone</h3>
-            <div class="qr-container">
-                <canvas id="qrCanvas" width="240" height="240"></canvas>
-            </div>
-            <p class="qr-instruction">
-                Open PossibilityData on your phone → Download tab → Enter ID manually if QR doesn't work
-            </p>
-            <button class="modal-close" onclick="closeQR(event)">
-                <span>✓</span> Got it
-            </button>
+            <canvas id="qrCanvas" width="250" height="250"></canvas>
+            <br>
+            <button class="modal-close" onclick="closeQR()">Close</button>
         </div>
     </div>
 
-    <!-- Toast Notification -->
+    <!-- Toast -->
     <div class="toast" id="toast"></div>
-    
-    <!-- Install Prompt -->
-    <div class="install-prompt" id="installPrompt">
-        <button class="install-close" onclick="dismissInstallPrompt()" aria-label="Close">✕</button>
-        <h4>✨ Install App</h4>
-        <p>Get quick access to secure file sharing without opening your browser</p>
-        <button class="install-btn" id="installBtn">
-            <span>📲</span> Install PossibilityData
-        </button>
-    </div>
 
     <script>
-        // ===== SECURITY: PREVENT UNWANTED NAVIGATION =====
-        document.addEventListener('click', function(e) {
-            if (e.target.tagName === 'A') {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        });
-        document.addEventListener('touchstart', function(e) {
-            if (e.target.tagName === 'A') {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        }, { passive: false });
+        // ===== MOBILE DETECTION UTILITIES =====
+        function isIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent) || 
+                   (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
         
-        // Prevent context menu for better mobile UX
-        document.addEventListener('contextmenu', function(e) {
-            if (e.target.closest('.upload-zone, .file-preview, .result-box, .download-section')) {
-                e.preventDefault();
-            }
-        });
+        function isAndroid() {
+            return /Android/.test(navigator.userAgent);
+        }
+        
+        function isMobile() {
+            return isIOS() || isAndroid() || /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
 
-        // ===== LOCAL STORAGE BACKEND (LAPTOP AS SECURE SERVER) =====
-        const LocalStorageBackend = {
-            dbName: 'PossibilityDataSecure',
-            storeName: 'files',
-            db: null,
-            expiryDays: 30,
-            maxStorageMB: 500, // 500MB limit
+        // ✅ MOBILE-OPTIMIZED DOWNLOAD HANDLER
+        function triggerMobileDownload(url) {
+            if (!url) {
+                showToast('⚠️ No download URL available', 'error');
+                return;
+            }
             
-            async init() {
-                return new Promise((resolve, reject) => {
-                    const request = indexedDB.open(this.dbName, 1);
-                    
-                    request.onupgradeneeded = (event) => {
-                        const db = event.target.result;
-                        if (!db.objectStoreNames.contains(this.storeName)) {
-                            const store = db.createObjectStore(this.storeName, { keyPath: 'id' });
-                            store.createIndex('expiry', 'expiry', { unique: false });
-                            store.createIndex('created', 'created', { unique: false });
-                            store.createIndex('size', 'size', { unique: false });
-                        }
-                    };
-                    
-                    request.onsuccess = (event) => {
-                        this.db = event.target.result;
-                        this.cleanupExpired();
-                        this.updateStorageInfo();
-                        resolve();
-                    };
-                    
-                    request.onerror = (event) => {
-                        console.error('IndexedDB error:', event.target.error);
-                        showToast('⚠️ Local storage unavailable. Using fallback mode.', 'error');
-                        reject(event.target.error);
-                    };
-                });
-            },
-            
-            async saveFile(file, metadata) {
-                return new Promise((resolve, reject) => {
-                    // Check storage quota first
-                    if (navigator.storage && navigator.storage.estimate) {
-                        navigator.storage.estimate().then(estimate => {
-                            if (estimate.usage + file.size > estimate.quota * 0.9) {
-                                reject(new Error('Storage quota nearly full. Delete old files first.'));
-                                return;
-                            }
-                            proceedWithSave.call(this);
-                        }).catch(proceedWithSave.bind(this));
-                    } else {
-                        proceedWithSave.call(this);
+            // iOS Safari: Open in same tab (only reliable method for cross-origin)
+            if (isIOS()) {
+                // Show helpful message for iOS users
+                showToast('📱 iOS: File will open in new tab. Tap ⬇️ to save.', 'success');
+                // Small delay to allow toast to show, then open
+                setTimeout(() => {
+                    const newWindow = window.open(url, '_blank');
+                    if (!newWindow || newWindow.closed || typeof newWindow.closed === 'undefined') {
+                        // Fallback if popup blocked
+                        window.location.href = url;
                     }
-                    
-                    const self = this;
-                    function proceedWithSave() {
-                        const transaction = self.db.transaction([self.storeName], 'readwrite');
-                        const store = transaction.objectStore(self.storeName);
-                        
-                        const now = new Date();
-                        const expiry = new Date();
-                        expiry.setDate(expiry.getDate() + self.expiryDays);
-                        
-                        const record = {
-                            id: metadata.id,
-                            name: file.name,
-                            type: file.type || 'application/octet-stream',
-                            size: file.size,
-                            created: now.getTime(),
-                            expiry: expiry.getTime(),
-                            data: file, // Store the actual File object
-                            metadata: {
-                                ...metadata,
-                                uploadedFrom: deviceType,
-                                originalPath: file.webkitRelativePath || ''
-                            }
-                        };
-                        
-                        const request = store.add(record);
-                        
-                        request.onsuccess = () => {
-                            self.updateStorageInfo();
-                            resolve(record);
-                        };
-                        
-                        request.onerror = (event) => {
-                            console.error('Save error:', event.target.error);
-                            if (event.target.error.name === 'QuotaExceededError') {
-                                reject(new Error('Storage full. Please delete old files first.'));
-                            } else {
-                                reject(event.target.error);
-                            }
-                        };
+                }, 500);
+            } 
+            // Android Chrome: Use window.open (handles downloads well)
+            else if (isAndroid()) {
+                window.open(url, '_blank');
+                showToast('📥 Download starting on Android...', 'success');
+            } 
+            // Desktop: Try download attribute, fallback to new tab
+            else {
+                const a = document.createElement('a');
+                a.href = url;
+                a.target = '_blank';
+                a.rel = 'noopener noreferrer';
+                // Note: download attribute only works for same-origin or blob URLs
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('📥 Download initiated', 'success');
+            }
+        }
+
+        // ===== CONFIGURABLE BACKENDS =====
+        const BACKENDS = {
+            tmpfiles: {
+                url: 'https://tmpfiles.org/api/v1/upload',
+                parseResponse: (text) => {
+                    try {
+                        const data = JSON.parse(text);
+                        return data.data?.url?.replace('/dl/', '/d/');
+                    } catch { return null; }
+                },
+                maxSize: 100 * 1024 * 1024,
+                expiry: '60 minutes'
+            },
+            storage: {
+                url: 'https://storage.to/api/v1/upload',
+                parseResponse: (text) => {
+                    try {
+                        const data = JSON.parse(text);
+                        return data.url || data.download_url || null;
+                    } catch { return null; }
+                },
+                maxSize: 25 * 1024 * 1024 * 1024,
+                expiry: '3 days'
+            },
+            custom: {
+                url: '',
+                parseResponse: (text) => {
+                    try {
+                        const data = JSON.parse(text);
+                        return data.url || data.download_url || data.file_url || data.link || null;
+                    } catch {
+                        if (text.trim().startsWith('http')) return text.trim();
+                        return null;
                     }
-                });
-            },
-            
-            async getFile(id) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction([this.storeName], 'readonly');
-                    const store = transaction.objectStore(this.storeName);
-                    const request = store.get(id);
-                    
-                    request.onsuccess = () => {
-                        if (request.result) {
-                            // Check if expired
-                            if (request.result.expiry < Date.now()) {
-                                this.deleteFile(id).catch(() => {});
-                                resolve(null);
-                            } else {
-                                resolve(request.result);
-                            }
-                        } else {
-                            resolve(null);
-                        }
-                    };
-                    
-                    request.onerror = (event) => reject(event.target.error);
-                });
-            },
-            
-            async deleteFile(id) {
-                return new Promise((resolve, reject) => {
-                    const transaction = this.db.transaction([this.storeName], 'readwrite');
-                    const store = transaction.objectStore(this.storeName);
-                    const request = store.delete(id);
-                    
-                    request.onsuccess = () => {
-                        this.updateStorageInfo();
-                        resolve();
-                    };
-                    
-                    request.onerror = (event) => reject(event.target.error);
-                });
-            },
-            
-            async cleanupExpired() {
-                return new Promise((resolve) => {
-                    if (!this.db) return resolve([]);
-                    
-                    const transaction = this.db.transaction([this.storeName], 'readwrite');
-                    const store = transaction.objectStore(this.storeName);
-                    const index = store.index('expiry');
-                    const now = Date.now();
-                    const deleted = [];
-                    
-                    const request = index.openCursor();
-                    
-                    request.onsuccess = (event) => {
-                        const cursor = event.target.result;
-                        if (cursor) {
-                            if (cursor.value.expiry < now) {
-                                cursor.delete();
-                                deleted.push(cursor.value.name);
-                            }
-                            cursor.continue();
-                        } else {
-                            if (deleted.length > 0) {
-                                console.log(`🧹 Cleaned up ${deleted.length} expired files`);
-                                this.updateStorageInfo();
-                                showToast(`🧹 Auto-cleaned ${deleted.length} expired files`, 'success');
-                            }
-                            resolve(deleted);
-                        }
-                    };
-                    
-                    request.onerror = () => resolve([]);
-                });
-            },
-            
-            async getAllFiles() {
-                return new Promise((resolve, reject) => {
-                    if (!this.db) return resolve([]);
-                    
-                    const transaction = this.db.transaction([this.storeName], 'readonly');
-                    const store = transaction.objectStore(this.storeName);
-                    const request = store.getAll();
-                    
-                    request.onsuccess = () => {
-                        // Filter out expired files
-                        const validFiles = request.result.filter(file => file.expiry > Date.now());
-                        resolve(validFiles);
-                    };
-                    
-                    request.onerror = (event) => reject(event.target.error);
-                });
-            },
-            
-            async updateStorageInfo() {
-                if (!this.db) return;
-                
-                try {
-                    const transaction = this.db.transaction([this.storeName], 'readonly');
-                    const store = transaction.objectStore(this.storeName);
-                    const request = store.getAll();
-                    
-                    request.onsuccess = async () => {
-                        let totalSize = 0;
-                        request.result.forEach(file => totalSize += file.size || 0);
-                        
-                        document.getElementById('storageUsed').textContent = formatFileSize(totalSize);
-                        
-                        // Try to get actual quota if available
-                        if (navigator.storage && navigator.storage.estimate) {
-                            try {
-                                const estimate = await navigator.storage.estimate();
-                                document.getElementById('storageQuota').textContent = formatFileSize(estimate.quota);
-                                
-                                // Warn if near limit
-                                if (totalSize > estimate.quota * 0.85) {
-                                    showToast('⚠️ Storage nearly full! Delete old files.', 'error');
-                                }
-                            } catch (e) {
-                                document.getElementById('storageQuota').textContent = '~500 MB';
-                            }
-                        } else {
-                            document.getElementById('storageQuota').textContent = '~500 MB';
-                        }
-                    };
-                } catch (e) {
-                    console.warn('Could not update storage info:', e);
-                }
-            },
-            
-            generateUniqueId() {
-                const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-                let result = 'PD-';
-                for (let i = 0; i < 6; i++) {
-                    result += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return result;
+                },
+                maxSize: null,
+                expiry: 'configurable'
             }
         };
 
         // ===== GLOBAL STATE =====
         let selectedFile = null;
         let uploadHistory = JSON.parse(localStorage.getItem('possibilitydata_history') || '[]');
-        let currentDownloadUrl = '';
-        let currentFileRecord = null;
-        let deferredPrompt = null;
-        const deviceType = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ? 'phone' : 'laptop';
-        let urgeInterval = null;
+        let currentBackend = 'tmpfiles';
+        let currentDownloadUrl = ''; // Store for download button
 
         // ===== INIT =====
-        document.addEventListener('DOMContentLoaded', async () => {
-            // Detect device type and update UI
-            updateDeviceBadge();
-            
-            // Initialize secure local storage backend
-            try {
-                await LocalStorageBackend.init();
-                document.getElementById('statusText').textContent = '✅ Secure Local Storage Ready';
-                document.getElementById('statusDot').className = 'status-indicator status-online';
-            } catch (e) {
-                console.error('Failed to initialize storage:', e);
-                document.getElementById('statusText').textContent = '⚠️ Fallback Mode';
-                document.getElementById('statusDot').className = 'status-indicator';
-                document.getElementById('statusDot').style.background = 'var(--warning)';
-            }
-            
-            // Load history and setup UI
+        document.addEventListener('DOMContentLoaded', () => {
+            loadConfig();
             renderHistory();
-            setupDragAndClick();
-            setupInstallPrompt();
-            setupUrgeAnimation();
+            setupDragDrop();
+            updateBackend();
             
-            // Start periodic cleanup (every hour)
-            setInterval(() => LocalStorageBackend.cleanupExpired(), 60 * 60 * 1000);
-            
-            // Handle protocol links (possibilitydata://)
-            handleProtocolLinks();
-            
-            // Show welcome toast
-            setTimeout(() => {
-                showToast('🌿 Green theme loaded • Files stay on your device • Tap to upload', 'success');
-            }, 800);
+            // PWA: Register service worker if available
+            if ('serviceWorker' in navigator) {
+                // Note: Add your actual sw.js path when deploying
+                // navigator.serviceWorker.register('/sw.js').catch(console.log);
+            }
         });
 
-        function updateDeviceBadge() {
-            const badge = document.getElementById('deviceBadge');
-            const text = document.getElementById('deviceText');
-            
-            if (deviceType === 'laptop') {
-                badge.className = 'device-badge laptop';
-                badge.innerHTML = '<span>💚</span> <span>Laptop Backend • Files Stay On Your Device</span>';
-                text.textContent = 'Laptop Backend • Files Stay On Your Device';
-            } else {
-                badge.className = 'device-badge phone';
-                badge.innerHTML = '<span>📱</span> <span>Phone Mode: Download Files from Laptop</span>';
-                text.textContent = 'Phone Mode: Download Files from Laptop';
-                // Disable upload functionality on phone for security
-                document.getElementById('uploadBtn').disabled = true;
-                document.getElementById('uploadBtn').title = 'Upload only available on laptop for security';
-                document.getElementById('dropZone').style.opacity = '0.5';
-                document.getElementById('dropZone').style.pointerEvents = 'none';
-                document.getElementById('dropZone').querySelector('.click-hint').textContent = '📱 Upload from your laptop first';
+        function loadConfig() {
+            const saved = localStorage.getItem('possibilitydata_config');
+            if (saved) {
+                const config = JSON.parse(saved);
+                currentBackend = config.backend || 'tmpfiles';
+                document.getElementById('backendSelect').value = currentBackend;
+                if (config.customUrl) {
+                    document.getElementById('customApiUrl').value = config.customUrl;
+                    BACKENDS.custom.url = config.customUrl;
+                }
+                if (currentBackend === 'custom') {
+                    document.getElementById('customUrlRow').style.display = 'flex';
+                }
             }
         }
 
-        function setupUrgeAnimation() {
-            const uploadBtn = document.getElementById('uploadBtn');
-            const btnText = uploadBtn.querySelector('.btn-text');
+        function saveConfig() {
+            const backend = document.getElementById('backendSelect').value;
+            const customUrl = document.getElementById('customApiUrl').value.trim();
             
-            // Clear any existing interval
-            if (urgeInterval) clearInterval(urgeInterval);
+            if (backend === 'custom' && !customUrl) {
+                showToast('⚠️ Please enter a custom API URL', 'error');
+                return;
+            }
             
-            // Show urging animation if no file selected after 8 seconds on upload tab
-            setTimeout(() => {
-                if (!selectedFile && 
-                    !uploadBtn.classList.contains('ready') && 
-                    document.getElementById('tab-upload').classList.contains('active')) {
-                    
-                    uploadBtn.classList.add('urge');
-                    btnText.innerHTML = '👆 Tap to select a file!';
-                    
-                    // Cycle through urging messages
-                    const messages = [
-                        '👆 Tap anywhere to open file picker!',
-                        '📁 Your files stay private on your laptop',
-                        '🎵🎬📸 Photos, videos, music - all supported!',
-                        '⏰ Files auto-delete after 30 days',
-                        '🔒 No external servers • 100% local storage'
-                    ];
-                    let msgIndex = 0;
-                    
-                    urgeInterval = setInterval(() => {
-                        if (!selectedFile && document.getElementById('tab-upload').classList.contains('active')) {
-                            btnText.innerHTML = messages[msgIndex];
-                            msgIndex = (msgIndex + 1) % messages.length;
-                            uploadBtn.classList.add('shake');
-                            setTimeout(() => uploadBtn.classList.remove('shake'), 500);
-                        } else {
-                            clearInterval(urgeInterval);
-                            uploadBtn.classList.remove('urge');
-                        }
-                    }, 3500);
-                }
-            }, 8000);
+            currentBackend = backend;
+            if (backend === 'custom') {
+                BACKENDS.custom.url = customUrl;
+            }
+            
+            localStorage.setItem('possibilitydata_config', JSON.stringify({
+                backend,
+                customUrl: backend === 'custom' ? customUrl : ''
+            }));
+            
+            updateBackend();
+            showToast('✅ Configuration saved!', 'success');
+        }
+
+        function updateBackend() {
+            const backend = document.getElementById('backendSelect').value;
+            document.getElementById('customUrlRow').style.display = backend === 'custom' ? 'flex' : 'none';
+            
+            const info = BACKENDS[backend];
+            document.getElementById('statusText').textContent = 
+                `${info.maxSize ? formatFileSize(info.maxSize) + ' max' : 'Custom'} • ${info.expiry} expiry`;
+            
+            const dropZone = document.getElementById('dropZone');
+            dropZone.querySelector('p').textContent = 
+                `Images, Videos, Documents — ${info.maxSize ? 'up to ' + formatFileSize(info.maxSize) : 'size depends on server'}`;
         }
 
         // ===== TAB SWITCHING =====
-        function switchTab(tab, e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
+        function switchTab(tab) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
-            if (e && e.currentTarget) {
-                e.currentTarget.classList.add('active');
-            }
-            
-            // Re-trigger urge animation when returning to upload tab
-            if (tab === 'upload' && !selectedFile) {
-                setupUrgeAnimation();
-            }
-            
-            // Hide download button on other tabs
-            if (tab !== 'upload') {
-                document.getElementById('downloadBtnNow')?.classList.add('hidden');
-            }
+            event.currentTarget.classList.add('active');
         }
 
-        // ===== DRAG & CLICK TO OPEN FILE PICKER =====
-        function setupDragAndClick() {
+        // ===== DRAG & DROP =====
+        function setupDragDrop() {
             const dropZone = document.getElementById('dropZone');
-            const fileInput = document.getElementById('fileInput');
-            
-            // Prevent default drag behaviors
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
-                dropZone.addEventListener(evt, function(e) { 
-                    e.preventDefault(); 
-                    e.stopPropagation(); 
-                }, false);
+                dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); }, false);
             });
-
-            // Visual feedback for drag
-            dropZone.addEventListener('dragenter', function() { 
-                dropZone.classList.add('dragover'); 
-                dropZone.querySelector('.upload-icon').textContent = '✅';
-            }, false);
-            
-            dropZone.addEventListener('dragover', function() { 
-                dropZone.classList.add('dragover'); 
-            }, false);
-            
-            dropZone.addEventListener('dragleave', function() { 
+            dropZone.addEventListener('dragenter', () => dropZone.classList.add('dragover'), false);
+            dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'), false);
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'), false);
+            dropZone.addEventListener('drop', e => {
                 dropZone.classList.remove('dragover');
-                dropZone.querySelector('.upload-icon').textContent = '☁️➡️💚';
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
             }, false);
-            
-            // Handle file drop
-            dropZone.addEventListener('drop', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                dropZone.classList.remove('dragover');
-                dropZone.querySelector('.upload-icon').textContent = '☁️➡️💚';
-                
-                if (e.dataTransfer.files.length) {
-                    handleFile(e.dataTransfer.files[0]);
-                }
-            }, false);
-
-            // CLICK TO OPEN FILE PICKER - Works on all devices including smartphones
-            dropZone.addEventListener('click', function(e) {
-                if (deviceType !== 'laptop') return;
-                e.preventDefault();
-                e.stopPropagation();
-                fileInput.click(); // Opens native file picker popup
-                showToast('📁 File picker opened • Select your file', 'success');
-            }, false);
-            
-            // Keyboard accessibility
-            dropZone.addEventListener('keydown', function(e) {
-                if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    fileInput.click();
-                }
+            document.getElementById('fileInput').addEventListener('change', e => {
+                if (e.target.files.length) handleFile(e.target.files[0]);
             });
-
-            // Handle file selection from picker
-            fileInput.addEventListener('change', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                if (this.files && this.files.length) {
-                    handleFile(this.files[0]);
-                }
-            }, false);
         }
 
         // ===== FILE HANDLING =====
         function handleFile(file) {
+            const backend = BACKENDS[currentBackend];
+            if (backend.maxSize && file.size > backend.maxSize) {
+                showToast(`⚠️ File too large for ${currentBackend} (max ${formatFileSize(backend.maxSize)})`, 'error');
+                return;
+            }
+            
             selectedFile = file;
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileSize').textContent = formatFileSize(file.size);
@@ -1513,591 +597,222 @@
             iconEl.className = 'file-icon ' + getIconClass(ext);
             document.getElementById('filePreview').classList.add('show');
             document.getElementById('uploadBtn').classList.add('ready');
-            document.getElementById('uploadBtn').classList.remove('urge');
             document.getElementById('resultBox').classList.remove('show');
-            
-            // Stop urge animation
-            if (urgeInterval) {
-                clearInterval(urgeInterval);
-                urgeInterval = null;
-            }
-            const btnText = document.getElementById('uploadBtn').querySelector('.btn-text');
-            btnText.innerHTML = '🚀 Save to Laptop & Generate ID';
-            
-            // Show media preview if applicable
-            showMediaPreview(file);
-            
-            showToast(`✅ ${file.name} ready • Tap upload to save`, 'success');
         }
 
-        function showMediaPreview(file) {
-            const previewContainer = document.getElementById('mediaPreview');
-            previewContainer.innerHTML = '';
-            previewContainer.classList.remove('show');
-            
-            if (file.type.startsWith('image/')) {
-                const img = document.createElement('img');
-                img.src = URL.createObjectURL(file);
-                img.alt = file.name;
-                img.onload = () => URL.revokeObjectURL(img.src);
-                previewContainer.appendChild(img);
-                previewContainer.classList.add('show');
-            } 
-            else if (file.type.startsWith('video/')) {
-                const video = document.createElement('video');
-                video.src = URL.createObjectURL(file);
-                video.controls = true;
-                video.preload = 'metadata';
-                previewContainer.appendChild(video);
-                previewContainer.classList.add('show');
-            } 
-            else if (file.type.startsWith('audio/')) {
-                const audio = document.createElement('audio');
-                audio.src = URL.createObjectURL(file);
-                audio.controls = true;
-                previewContainer.appendChild(audio);
-                previewContainer.classList.add('show');
-            }
-        }
-
-        function removeFile(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
+        function removeFile() {
             selectedFile = null;
-            currentFileRecord = null;
             document.getElementById('fileInput').value = '';
             document.getElementById('filePreview').classList.remove('show');
             document.getElementById('uploadBtn').classList.remove('ready');
-            document.getElementById('uploadBtn').classList.remove('urge');
             document.getElementById('resultBox').classList.remove('show');
             document.getElementById('progressContainer').classList.remove('show');
-            document.getElementById('mediaPreview').innerHTML = '';
-            
-            // Restart urge animation
-            setupUrgeAnimation();
-            showToast('🗑️ File selection cleared', 'success');
         }
 
-        // ===== UPLOAD TO LOCAL STORAGE =====
-        async function uploadFile(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            if (!selectedFile) {
-                showToast('⚠️ Please select a file first', 'error');
-                document.getElementById('uploadBtn').classList.add('shake');
-                setTimeout(() => document.getElementById('uploadBtn').classList.remove('shake'), 500);
-                // Re-show urging message
-                const btnText = document.getElementById('uploadBtn').querySelector('.btn-text');
-                btnText.innerHTML = '👆 Tap to select a file!';
-                document.getElementById('uploadBtn').classList.add('urge');
-                return;
-            }
-            
-            if (deviceType !== 'laptop') {
-                showToast('⚠️ Upload only available on laptop for security', 'error');
+        // ===== UPLOAD =====
+        async function uploadFile() {
+            if (!selectedFile) return;
+            const backend = BACKENDS[currentBackend];
+            if (currentBackend === 'custom' && !backend.url) {
+                showToast('⚠️ Please configure a custom API URL first', 'error');
                 return;
             }
 
             const btn = document.getElementById('uploadBtn');
-            const btnText = btn.querySelector('.btn-text');
             const progressContainer = document.getElementById('progressContainer');
             const progressFill = document.getElementById('progressFill');
             const progressText = document.getElementById('progressText');
             const progressPercent = document.getElementById('progressPercent');
 
-            // Disable button and show progress
             btn.disabled = true;
-            btn.classList.remove('ready', 'urge');
-            btnText.innerHTML = '<span class="spinner"></span> Saving securely to laptop...';
+            btn.innerHTML = '<span class="spinner"></span> Uploading...';
             progressContainer.classList.add('show');
-            progressFill.style.width = '0%';
-            progressPercent.textContent = '0%';
 
             try {
-                // Simulate upload progress for better UX
-                let progress = 0;
-                const progressInterval = setInterval(() => {
-                    progress += Math.random() * 12;
-                    if (progress > 95) progress = 95;
-                    progressFill.style.width = Math.min(progress, 95) + '%';
-                    progressPercent.textContent = Math.min(Math.round(progress), 95) + '%';
-                    progressText.textContent = `Encrypting & saving ${selectedFile.name}...`;
-                }, 250);
+                const formData = new FormData();
+                formData.append('file', selectedFile);
 
-                // Generate unique ID and metadata
-                const uniqueId = LocalStorageBackend.generateUniqueId();
-                const metadata = {
-                    id: uniqueId,
-                    originalName: selectedFile.name,
-                    uploadedAt: new Date().toISOString(),
-                    device: deviceType,
-                    mimeType: selectedFile.type
-                };
-                
-                // Save file to IndexedDB (local storage)
-                await LocalStorageBackend.saveFile(selectedFile, metadata);
-                
-                // Complete progress animation
-                clearInterval(progressInterval);
-                progressFill.style.width = '100%';
-                progressPercent.textContent = '100%';
-                progressText.textContent = '✅ Saved securely!';
-                
-                // Store reference for download button
-                currentFileRecord = {
-                    id: uniqueId,
-                    name: selectedFile.name,
-                    data: selectedFile,
-                    url: URL.createObjectURL(selectedFile)
-                };
-                currentDownloadUrl = currentFileRecord.url;
-                
-                // Show result after brief delay for animation
-                setTimeout(() => {
-                    document.getElementById('downloadLink').textContent = `possibilitydata://${uniqueId}`;
-                    document.getElementById('uniqueId').textContent = uniqueId;
-                    document.getElementById('resultBox').classList.add('show');
-                    document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // Add to history
-                    const historyItem = {
-                        id: uniqueId, 
-                        name: selectedFile.name,
-                        size: formatFileSize(selectedFile.size), 
-                        type: selectedFile.name.split('.').pop().toUpperCase(),
-                        date: new Date().toLocaleDateString('en-US', { 
-                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-                        }),
-                        expiry: new Date(Date.now() + 30*24*60*60*1000).toLocaleDateString()
-                    };
-                    uploadHistory.unshift(historyItem);
-                    localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
-                    renderHistory();
-                    
-                    // Success animation
-                    document.querySelector('.result-header .check-icon').classList.add('bounce');
-                    showToast('✅ File saved securely to your laptop!', 'success');
-                    
-                    // Show celebration animation
-                    celebrateUpload();
-                    
-                    // Enable download button
-                    document.getElementById('downloadBtnNow').disabled = false;
-                    document.getElementById('downloadBtnNow').classList.add('download-ready');
-                    
-                }, 450);
-                
-            } catch (error) {
-                console.error('Upload error:', error);
-                showToast('❌ Failed to save: ' + (error.message || 'Storage error'), 'error');
-                progressText.textContent = '❌ Save failed';
-                progressFill.style.background = 'var(--warning)';
-                document.getElementById('downloadBtnNow').disabled = true;
-            } finally {
-                // Reset button after delay
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.classList.add('ready');
-                    btnText.innerHTML = '🚀 Save to Laptop & Generate ID';
-                    progressContainer.classList.remove('show');
-                }, 1800);
-            }
-        }
-        
-        function celebrateUpload() {
-            // Create celebration particles with green theme
-            const resultBox = document.getElementById('resultBox');
-            const rect = resultBox.getBoundingClientRect();
-            
-            for (let i = 0; i < 25; i++) {
-                const particle = document.createElement('div');
-                particle.style.position = 'absolute';
-                particle.style.width = '10px';
-                particle.style.height = '10px';
-                particle.style.borderRadius = '50%';
-                particle.style.background = `hsl(${140 + Math.random() * 40}, 80%, 60%)`;
-                particle.style.left = `${rect.left + rect.width/2 + (Math.random() - 0.5) * 120}px`;
-                particle.style.top = `${rect.top + rect.height/2 + (Math.random() - 0.5) * 60}px`;
-                particle.style.zIndex = '100';
-                particle.style.pointerEvents = 'none';
-                particle.style.opacity = '0.95';
-                particle.style.boxShadow = '0 0 10px var(--glow-green)';
-                document.body.appendChild(particle);
-                
-                // Animate particle
-                const angle = Math.random() * Math.PI * 2;
-                const velocity = 2.5 + Math.random() * 4;
-                const vx = Math.cos(angle) * velocity;
-                const vy = Math.sin(angle) * velocity - 3; // upward bias
-                let x = 0, y = 0, opacity = 0.95, size = 10;
-                
-                const animate = () => {
-                    x += vx;
-                    y += vy;
-                    vy += 0.12; // gravity
-                    opacity -= 0.025;
-                    size *= 0.97;
-                    
-                    if (opacity <= 0.05) {
-                        particle.remove();
-                        return;
+                const xhr = new XMLHttpRequest();
+                xhr.upload.addEventListener('progress', e => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        progressFill.style.width = percent + '%';
+                        progressPercent.textContent = percent + '%';
+                        progressText.textContent = `Uploading... ${formatFileSize(e.loaded)} / ${formatFileSize(e.total)}`;
                     }
-                    
-                    particle.style.transform = `translate(${x}px, ${y}px) scale(${size/10})`;
-                    particle.style.opacity = opacity;
-                    requestAnimationFrame(animate);
-                };
-                
-                requestAnimationFrame(animate);
+                });
+
+                xhr.addEventListener('load', () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        const downloadUrl = backend.parseResponse(xhr.responseText);
+                        if (!downloadUrl) {
+                            throw new Error('Could not parse download URL from response');
+                        }
+                        
+                        // ✅ Store URL for download button
+                        currentDownloadUrl = downloadUrl;
+                        
+                        const uniqueId = generateUniqueId();
+                        document.getElementById('downloadLink').textContent = downloadUrl;
+                        document.getElementById('uniqueId').textContent = uniqueId;
+                        document.getElementById('resultBox').classList.add('show');
+
+                        const historyItem = {
+                            id: uniqueId, name: selectedFile.name,
+                            size: formatFileSize(selectedFile.size), url: downloadUrl,
+                            type: selectedFile.name.split('.').pop().toUpperCase(),
+                            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
+                            backend: currentBackend
+                        };
+                        uploadHistory.unshift(historyItem);
+                        localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
+                        renderHistory();
+                        showToast('✅ File uploaded successfully!', 'success');
+                    } else {
+                        throw new Error(`Server responded with ${xhr.status}`);
+                    }
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Upload & Generate Link';
+                });
+
+                xhr.addEventListener('error', () => {
+                    throw new Error('Network error');
+                });
+
+                xhr.open('POST', backend.url);
+                xhr.send(formData);
+
+            } catch (error) {
+                showToast(`❌ Upload failed: ${error.message}`, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Upload & Generate Link';
             }
         }
 
         // ===== DOWNLOAD FUNCTIONS =====
-        async function fetchById(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            const code = document.getElementById('codeInput').value.trim().toUpperCase();
-            
-            if (!code || !code.startsWith('PD-')) { 
-                showToast('⚠️ Enter valid ID (e.g. PD-ABC123)', 'error'); 
-                document.getElementById('codeInput').classList.add('shake');
-                setTimeout(() => document.getElementById('codeInput').classList.remove('shake'), 500);
+        function fetchById() {
+            const code = document.getElementById('codeInput').value.trim();
+            if (!code) { showToast('⚠️ Please enter a valid ID', 'error'); return; }
+            const found = uploadHistory.find(h => h.id.toUpperCase() === code.toUpperCase());
+            if (found) { 
+                triggerMobileDownload(found.url); 
                 return; 
             }
-            
-            showToast('🔍 Searching your laptop storage...', 'success');
-            
-            try {
-                const record = await LocalStorageBackend.getFile(code);
-                if (record) {
-                    // Create blob URL and trigger download
-                    const blobUrl = URL.createObjectURL(record.data);
-                    const a = document.createElement('a');
-                    a.href = blobUrl;
-                    a.download = record.name;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    
-                    // Clean up blob URL after delay
-                    setTimeout(() => URL.revokeObjectURL(blobUrl), 2000);
-                    
-                    showToast(`📥 Downloading ${record.name}...`, 'success');
-                    
-                    // Add to download history
-                    const historyItem = {
-                        id: code, 
-                        name: record.name,
-                        size: formatFileSize(record.size), 
-                        type: record.name.split('.').pop().toUpperCase(),
-                        date: new Date().toLocaleDateString('en-US', { 
-                            month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' 
-                        }),
-                        downloaded: true
-                    };
-                    uploadHistory.unshift(historyItem);
-                    localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
-                    renderHistory();
-                    
-                    // Show download success animation
-                    celebrateDownload();
-                } else {
-                    showToast('⚠️ File not found or expired. Ask sender to re-upload.', 'error');
-                }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                showToast('❌ Error: ' + (error.message || 'Could not retrieve file'), 'error');
-            }
-        }
-        
-        function celebrateDownload() {
-            // Success badge animation
-            const badge = document.createElement('div');
-            badge.textContent = '✓ Download Complete!';
-            badge.style.cssText = `
-                position: fixed; top: 50%; left: 50%;
-                transform: translate(-50%, -50%) scale(0.8);
-                background: var(--success); color: #052015;
-                padding: 16px 32px; border-radius: 16px;
-                font-weight: 800; font-size: 1.3rem;
-                box-shadow: 0 0 50px var(--glow-green);
-                z-index: 3000; opacity: 0; pointer-events: none;
-                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            `;
-            document.body.appendChild(badge);
-            
-            // Animate in
-            setTimeout(() => {
-                badge.style.transform = 'translate(-50%, -50%) scale(1)';
-                badge.style.opacity = '1';
-            }, 10);
-            
-            // Animate out
-            setTimeout(() => {
-                badge.style.opacity = '0';
-                badge.style.transform = 'translate(-50%, -50%) scale(1.2)';
-                setTimeout(() => badge.remove(), 400);
-            }, 2200);
+            showToast('⚠️ ID not found in local history. Paste the full URL instead.', 'error');
         }
 
-        function fetchByUrl(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
+        function fetchByUrl() {
             const url = document.getElementById('urlInput').value.trim();
-            
-            if (!url) { 
-                showToast('⚠️ Please enter a URL', 'error'); 
-                return; 
-            }
-            
-            // Extract ID from possibilitydata:// URL
-            if (url.startsWith('possibilitydata://')) {
-                const id = url.replace('possibilitydata://', '').trim().toUpperCase();
-                document.getElementById('codeInput').value = id;
-                fetchById(e);
-            } else {
-                showToast('ℹ️ Use the Download ID instead of URLs for security', 'success');
-                document.getElementById('codeInput').focus();
-            }
+            if (!url || !url.startsWith('http')) { showToast('⚠️ Please paste a valid download URL', 'error'); return; }
+            triggerMobileDownload(url);
         }
 
         // ===== COPY & SHARE =====
-        function copyLink(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            const id = document.getElementById('uniqueId').textContent;
-            navigator.clipboard.writeText(id).then(() => {
-                showToast('📋 ID copied to clipboard!', 'success');
-            }).catch(() => {
-                // Fallback for older browsers
-                const textarea = document.createElement('textarea');
-                textarea.value = id;
-                textarea.style.position = 'fixed';
-                textarea.style.opacity = '0';
-                document.body.appendChild(textarea);
-                textarea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textarea);
-                showToast('📋 ID copied!', 'success');
-            });
+        function copyLink() {
+            const link = document.getElementById('downloadLink').textContent;
+            navigator.clipboard.writeText(link).then(() => showToast('📋 Link copied!', 'success'))
+                .catch(() => {
+                    const ta = document.createElement('textarea'); ta.value = link;
+                    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+                    document.body.removeChild(ta); showToast('📋 Link copied!', 'success');
+                });
         }
 
-        async function shareLink(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            const id = document.getElementById('uniqueId').textContent;
-            const fileName = document.getElementById('fileName').textContent || 'a file';
-            
+        async function shareLink() {
+            const link = document.getElementById('downloadLink').textContent;
             if (navigator.share) {
                 try {
-                    await navigator.share({
-                        title: 'PossibilityData',
-                        text: `Download "${fileName}" securely. Open PossibilityData on your phone and enter ID: ${id}`,
-                        url: window.location.href
-                    });
-                    showToast('📤 Share dialog opened', 'success');
-                } catch (err) {
-                    if (err.name !== 'AbortError') {
-                        copyLink();
-                    }
-                }
-            } else {
-                copyLink();
-            }
-        }
-
-        // ===== DOWNLOAD BUTTON - WORKS ON ANY DEVICE WITH FILE =====
-        function downloadFileNow(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            
-            // First try current file reference (just uploaded)
-            if (currentDownloadUrl && currentFileRecord) {
-                const a = document.createElement('a');
-                a.href = currentDownloadUrl;
-                a.download = currentFileRecord.name;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                showToast('📥 Download started!', 'success');
-                celebrateDownload();
-                return;
-            }
-            
-            // Try to fetch from storage by ID
-            const id = document.getElementById('uniqueId')?.textContent;
-            if (id && id !== 'PD-XXXXXX') {
-                LocalStorageBackend.getFile(id).then(record => {
-                    if (record) {
-                        const blobUrl = URL.createObjectURL(record.data);
-                        const a = document.createElement('a');
-                        a.href = blobUrl;
-                        a.download = record.name;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                        setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
-                        showToast(`📥 Downloading ${record.name}...`, 'success');
-                        celebrateDownload();
-                    } else {
-                        showToast('⚠️ File not available. It may have expired.', 'error');
-                    }
-                }).catch(err => {
-                    console.error('Download error:', err);
-                    showToast('❌ Could not start download', 'error');
-                });
-            } else {
-                showToast('⚠️ No file available for download', 'error');
-            }
+                    await navigator.share({ title: 'PossibilityData', text: 'Download your file', url: link });
+                } catch { copyLink(); }
+            } else { copyLink(); }
         }
 
         // ===== QR CODE =====
-        function showQR(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            const id = document.getElementById('uniqueId').textContent;
-            if (!id || id === 'PD-XXXXXX') {
-                showToast('⚠️ No ID available for QR code', 'error');
-                return;
-            }
-            
+        function showQR() {
+            const link = document.getElementById('downloadLink').textContent;
             const canvas = document.getElementById('qrCanvas');
-            const ctx = canvas.getContext('2d');
-            const size = canvas.width;
-            
-            // Clear canvas with white background
-            ctx.fillStyle = 'white';
-            ctx.fillRect(0, 0, size, size);
-            
-            // Draw decorative border
-            ctx.strokeStyle = '#1a4a30';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(8, 8, size-16, size-16);
-            
-            // Draw app branding
-            ctx.fillStyle = '#0a1a0f';
-            ctx.font = 'bold 16px -apple-system, sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText('PossibilityData', size/2, 28);
-            
-            // Draw ID prominently
-            ctx.font = 'bold 22px monospace';
-            ctx.fillStyle = '#00d474';
-            ctx.fillText(id, size/2, size/2 - 5);
-            
-            // Draw instructions
-            ctx.font = '13px -apple-system, sans-serif';
-            ctx.fillStyle = '#5a7a65';
-            ctx.fillText('Enter in Download tab', size/2, size/2 + 28);
-            
-            // Draw decorative elements
-            ctx.fillStyle = '#00d474';
-            ctx.beginPath();
-            ctx.arc(size/2, size - 25, 12, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.fillStyle = 'white';
-            ctx.font = '14px Arial';
-            ctx.fillText('📁', size/2, size - 20);
-            
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(link)}&bgcolor=1a1a2e&color=ffffff&margin=10`;
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(0, 0, 250, 250);
+                ctx.drawImage(img, 0, 0, 250, 250);
+            };
+            img.src = qrApiUrl;
             document.getElementById('qrModal').classList.add('show');
         }
-
-        function closeQR(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            document.getElementById('qrModal').classList.remove('show');
-        }
+        function closeQR() { document.getElementById('qrModal').classList.remove('show'); }
 
         // ===== HISTORY =====
         function renderHistory() {
             const list = document.getElementById('historyList');
             const clearBtn = document.getElementById('clearHistoryBtn');
-
             if (uploadHistory.length === 0) {
-                list.innerHTML = '<div class="empty-history">No files uploaded yet. Start by uploading a file to your laptop!</div>';
-                clearBtn.style.display = 'none';
-                return;
+                list.innerHTML = '<div class="empty-history">No files uploaded yet.</div>';
+                clearBtn.style.display = 'none'; return;
             }
-
-            clearBtn.style.display = 'flex';
+            clearBtn.style.display = 'block';
             list.innerHTML = uploadHistory.map((item, index) => `
                 <div class="history-item">
-                    <div class="file-icon ${getIconClass(item.type.toLowerCase())}">
-                        ${getFileIcon(item.type.toLowerCase())}
-                    </div>
+                    <div class="file-icon ${getIconClass(item.type.toLowerCase())}">${getFileIcon(item.type.toLowerCase())}</div>
                     <div class="history-details">
                         <div class="history-name">${item.name}</div>
-                        <div class="history-meta">
-                            <span>${item.size}</span>
-                            <span>•</span>
-                            <span>${item.date}</span>
-                            ${item.expiry ? `<span>• ⏰ ${item.expiry}</span>` : ''}
-                            ${item.downloaded ? `<span class="text-success">✓ Downloaded</span>` : ''}
-                        </div>
+                        <div class="history-meta">${item.size} • ${item.date} • ${item.backend}</div>
                     </div>
-                    <div class="history-actions">
-                        <button class="history-copy" onclick="copyHistoryId('${item.id}', event)" title="Copy ID">📋</button>
-                        <button class="history-delete" onclick="deleteHistoryItem(${index}, event)" title="Remove">🗑️</button>
-                    </div>
-                </div>
-            `).join('');
+                    <button class="history-copy" onclick="copyHistoryLink(${index})">📋</button>
+                    <button class="history-delete" onclick="deleteHistoryItem(${index})">🗑️</button>
+                </div>`).join('');
         }
-
-        function copyHistoryId(id, e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            navigator.clipboard.writeText(id).then(() => {
-                showToast('📋 ID copied to clipboard!', 'success');
-            }).catch(() => {
-                showToast('📋 ID copied!', 'success');
-            });
+        function copyHistoryLink(index) {
+            navigator.clipboard.writeText(uploadHistory[index].url).then(() => showToast('📋 Link copied!', 'success'));
         }
-
-        function deleteHistoryItem(index, e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            const item = uploadHistory[index];
-            if (item.id && item.id.startsWith('PD-')) {
-                // Also delete from IndexedDB if it exists there
-                LocalStorageBackend.deleteFile(item.id).catch(() => {});
-            }
+        function deleteHistoryItem(index) {
             uploadHistory.splice(index, 1);
             localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
-            renderHistory();
-            showToast('🗑️ Removed from history', 'success');
+            renderHistory(); showToast('🗑️ Removed from history', 'success');
         }
-
-        function clearHistory(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            if (confirm('Clear all upload history? Files in storage remain until they expire.')) {
-                uploadHistory = [];
-                localStorage.setItem('possibilitydata_history', '[]');
-                renderHistory();
-                showToast('🗑️ History cleared', 'success');
+        function clearHistory() {
+            if (confirm('Clear all upload history?')) {
+                uploadHistory = []; localStorage.setItem('possibilitydata_history', '[]');
+                renderHistory(); showToast('🗑️ History cleared', 'success');
             }
         }
 
         // ===== UTILITIES =====
+        function generateUniqueId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = 'PD-';
+            for (let i = 0; i < 6; i++) result += chars.charAt(Math.floor(Math.random() * chars.length));
+            return result;
+        }
         function formatFileSize(bytes) {
             if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const k = 1024, sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
             const i = Math.floor(Math.log(bytes) / Math.log(k));
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
-
         function getFileIcon(ext) {
             const icons = {
-                jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️', svg: '🖼️', webp: '🖼️', bmp: '🖼️', ico: '🖼️',
-                mp4: '🎬', avi: '🎬', mov: '🎬', mkv: '🎬', webm: '🎬', flv: '🎬', wmv: '🎬',
-                mp3: '🎵', wav: '🎵', flac: '🎵', aac: '🎵', ogg: '🎵', wma: '🎵',
-                pdf: '📕', doc: '📘', docx: '📘', txt: '📝', rtf: '📝',
-                xls: '📊', xlsx: '📊', csv: '📊', ppt: '📙', pptx: '📙',
-                zip: '📦', rar: '📦', '7z': '📦', tar: '📦', gz: '📦',
-                js: '💻', html: '💻', css: '💻', py: '💻', java: '💻', cpp: '💻',
-                apk: '📱', exe: '⚙️', dmg: '💿', iso: '💿',
+                jpg:'🖼️',jpeg:'🖼️',png:'🖼️',gif:'🖼️',svg:'🖼️',webp:'🖼️',bmp:'🖼️',ico:'🖼️',
+                mp4:'🎬',avi:'🎬',mov:'🎬',mkv:'🎬',webm:'🎬',flv:'🎬',wmv:'🎬',
+                mp3:'🎵',wav:'🎵',flac:'🎵',aac:'🎵',ogg:'🎵',wma:'🎵',
+                pdf:'📕',doc:'📘',docx:'📘',txt:'📝',rtf:'📝',
+                xls:'📊',xlsx:'📊',csv:'📊',ppt:'📙',pptx:'📙',
+                zip:'📦',rar:'📦','7z':'📦',tar:'📦',gz:'📦',
+                js:'💻',html:'💻',css:'💻',py:'💻',java:'💻',cpp:'💻',
+                apk:'📱',exe:'⚙️',dmg:'💿',iso:'💿',
             };
             return icons[ext] || '📄';
         }
-
         function getIconClass(ext) {
-            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'];
-            const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', 'wmv'];
-            const audioExts = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma'];
-            const docExts = ['pdf'];
-            const zipExts = ['zip', 'rar', '7z', 'tar', 'gz'];
-            const docFileExts = ['doc', 'docx', 'txt', 'rtf', 'xls', 'xlsx', 'csv', 'ppt', 'pptx'];
-            const codeExts = ['js', 'html', 'css', 'py', 'java', 'cpp'];
-
+            const imageExts = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'],
+                  videoExts = ['mp4','avi','mov','mkv','webm','flv','wmv'],
+                  audioExts = ['mp3','wav','flac','aac','ogg','wma'],
+                  docExts = ['pdf'], zipExts = ['zip','rar','7z','tar','gz'],
+                  docFileExts = ['doc','docx','txt','rtf','xls','xlsx','csv','ppt','pptx'],
+                  codeExts = ['js','html','css','py','java','cpp'];
             if (imageExts.includes(ext)) return 'icon-image';
             if (videoExts.includes(ext)) return 'icon-video';
             if (audioExts.includes(ext)) return 'icon-audio';
@@ -2107,156 +822,14 @@
             if (codeExts.includes(ext)) return 'icon-code';
             return 'icon-other';
         }
-
         function showToast(message, type = 'success') {
             const toast = document.getElementById('toast');
             toast.textContent = message;
             toast.className = 'toast ' + type + ' show';
-            
-            // Auto-remove after timeout
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
+            setTimeout(() => toast.classList.remove('show'), 3000);
         }
-
-        // ===== CONFIG =====
-        function saveConfig(e) {
-            if (e) { e.preventDefault(); e.stopPropagation(); }
-            // In this local-only version, config is minimal
-            showToast('✅ Settings saved to your device', 'success');
-            LocalStorageBackend.updateStorageInfo();
-        }
-
-        // ===== PWA INSTALL PROMPT =====
-        function setupInstallPrompt() {
-            // Only show on supported browsers and when not already installed
-            if (!window.matchMedia('(display-mode: standalone)').matches && 
-                (deviceType === 'laptop' || /Android|iPhone|iPad/.test(navigator.userAgent))) {
-                
-                window.addEventListener('beforeinstallprompt', (e) => {
-                    e.preventDefault();
-                    deferredPrompt = e;
-                    document.getElementById('installPrompt').classList.add('show');
-                });
-                
-                // Also show after 45 seconds if not installed
-                setTimeout(() => {
-                    if (!window.matchMedia('(display-mode: standalone)').matches && 
-                        !document.getElementById('installPrompt').classList.contains('show')) {
-                        document.getElementById('installPrompt').classList.add('show');
-                    }
-                }, 45000);
-            }
-            
-            document.getElementById('installBtn').addEventListener('click', async () => {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') {
-                        showToast('🎉 App installed! Find it on your home screen', 'success');
-                    }
-                    deferredPrompt = null;
-                }
-                dismissInstallPrompt();
-            });
-        }
-        
-        function dismissInstallPrompt() {
-            document.getElementById('installPrompt').classList.remove('show');
-        }
-
-        // ===== PROTOCOL LINK HANDLING =====
-        function handleProtocolLinks() {
-            // Handle possibilitydata:// links when app is opened
-            if (window.location.protocol === 'possibilitydata:') {
-                const id = window.location.hostname;
-                if (id && id.startsWith('PD-')) {
-                    document.getElementById('codeInput').value = id;
-                    switchTab('download');
-                    fetchById(new Event('click'));
-                }
-            }
-        }
-
-        // ===== EVENT LISTENERS =====
-        document.getElementById('qrModal').addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            if (e.target.id === 'qrModal') {
-                closeQR();
-            }
-        }, false);
-
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                e.preventDefault();
-                closeQR();
-                dismissInstallPrompt();
-            }
-        }, false);
-
-        // Handle visibility change to manage animations
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                // Pause heavy animations when tab is not visible
-                document.querySelectorAll('.confetti, .particle').forEach(el => {
-                    el.style.animationPlayState = 'paused';
-                });
-            }
-        });
-
-        // Service Worker Registration for PWA offline support
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                const swCode = `
-                    const CACHE_NAME = 'possibilitydata-v1';
-                    const ASSETS = [
-                        '/',
-                        '/index.html'
-                    ];
-                    
-                    self.addEventListener('install', (event) => {
-                        event.waitUntil(
-                            caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
-                        );
-                        self.skipWaiting();
-                    });
-                    
-                    self.addEventListener('activate', (event) => {
-                        event.waitUntil(
-                            caches.keys().then((names) => {
-                                return Promise.all(
-                                    names.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
-                                );
-                            })
-                        );
-                        self.clients.claim();
-                    });
-                    
-                    self.addEventListener('fetch', (event) => {
-                        // Only handle navigation requests for offline fallback
-                        if (event.request.mode === 'navigate') {
-                            event.respondWith(
-                                fetch(event.request).catch(() => {
-                                    return caches.match('/').then((response) => {
-                                        return response || new Response('<h1>Offline</h1><p>PossibilityData works offline for downloads.', {
-                                            headers: {'Content-Type': 'text/html'}
-                                        });
-                                    });
-                                })
-                            );
-                        }
-                    });
-                `;
-                
-                const blob = new Blob([swCode], {type: 'application/javascript'});
-                const swUrl = URL.createObjectURL(blob);
-                
-                navigator.serviceWorker.register(swUrl)
-                    .then(reg => console.log('✅ Service Worker registered', reg))
-                    .catch(err => console.log('⚠️ SW registration failed', err));
-            });
-        }
+        document.getElementById('qrModal').addEventListener('click', e => { if (e.target.id === 'qrModal') closeQR(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQR(); });
     </script>
 </body>
 </html>
