@@ -1,0 +1,1418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📁 POSSIBILITYDATA </title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --bg-input: #16213e;
+            --accent: #0f3460;
+            --accent-light: #533483;
+            --highlight: #e94560;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0b8;
+            --success: #00d474;
+            --warning: #ffa502;
+            --border: #2a2a3e;
+            --glow: rgba(233, 69, 96, 0.3);
+            --glow-green: rgba(0, 212, 116, 0.3);
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* ===== ANIMATED BACKGROUND ===== */
+        .bg-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .bg-animation .circle {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.05;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .bg-animation .circle:nth-child(1) {
+            width: 600px; height: 600px;
+            background: var(--highlight);
+            top: -200px; left: -100px;
+            animation-delay: 0s;
+        }
+
+        .bg-animation .circle:nth-child(2) {
+            width: 400px; height: 400px;
+            background: var(--accent-light);
+            bottom: -150px; right: -100px;
+            animation-delay: -5s;
+        }
+
+        .bg-animation .circle:nth-child(3) {
+            width: 300px; height: 300px;
+            background: var(--success);
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50px, -50px) scale(1.1); }
+            50% { transform: translate(-30px, 30px) scale(0.9); }
+            75% { transform: translate(40px, 40px) scale(1.05); }
+        }
+
+        /* ===== CONTAINER ===== */
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            margin-bottom: 5px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        header h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--highlight), var(--accent-light), var(--success));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+        }
+
+        header p {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 1rem;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--bg-secondary);
+            border-radius: 16px;
+            padding: 6px;
+            margin-bottom: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
+            color: white;
+            box-shadow: 0 4px 20px var(--glow);
+        }
+
+        .tab-btn:hover:not(.active) {
+            color: var(--text-primary);
+            background: var(--bg-card);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== UPLOAD ZONE ===== */
+        .upload-zone {
+            border: 2px dashed var(--border);
+            border-radius: 20px;
+            padding: 50px 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--bg-card);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-zone::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(233, 69, 96, 0.05), rgba(83, 52, 131, 0.05));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .upload-zone:hover, .upload-zone.dragover {
+            border-color: var(--highlight);
+            box-shadow: 0 0 30px var(--glow);
+        }
+
+        .upload-zone:hover::before, .upload-zone.dragover::before {
+            opacity: 1;
+        }
+
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .upload-zone h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+        }
+
+        .upload-zone p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .upload-zone input[type="file"] {
+            display: none;
+        }
+
+        /* ===== FILE PREVIEW ===== */
+        .file-preview {
+            margin-top: 20px;
+            background: var(--bg-input);
+            border-radius: 16px;
+            padding: 20px;
+            display: none;
+            border: 1px solid var(--border);
+        }
+
+        .file-preview.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .file-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .file-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 600;
+            font-size: 1rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            margin-top: 2px;
+        }
+
+        .file-type-badge {
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .remove-file {
+            background: rgba(233, 69, 96, 0.2);
+            border: none;
+            color: var(--highlight);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+
+        .remove-file:hover {
+            background: var(--highlight);
+            color: white;
+        }
+
+        /* ===== UPLOAD BUTTON ===== */
+        .upload-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
+            color: white;
+            box-shadow: 0 4px 20px var(--glow);
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .upload-btn.ready {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .upload-btn.ready:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px var(--glow);
+        }
+
+        .upload-btn:active {
+            transform: translateY(0);
+        }
+
+        .upload-btn:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        /* ===== PROGRESS BAR ===== */
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-container.show {
+            display: block;
+        }
+
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .progress-bar-bg {
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--highlight), var(--success));
+            border-radius: 10px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* ===== RESULT / DOWNLOAD LINK ===== */
+        .result-box {
+            margin-top: 20px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 25px;
+            display: none;
+            border: 1px solid var(--success);
+            box-shadow: 0 0 30px var(--glow-green);
+        }
+
+        .result-box.show {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .result-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .result-header .check-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+        }
+
+        .result-header h3 {
+            color: var(--success);
+            font-size: 1.2rem;
+        }
+
+        .download-link-container {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            border: 1px solid var(--border);
+        }
+
+        .download-link {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            word-break: break-all;
+            font-family: 'Courier New', monospace;
+        }
+
+        .copy-btn, .share-btn, .qr-btn {
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .copy-btn {
+            background: var(--accent);
+            color: white;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent-light);
+        }
+
+        .share-btn {
+            background: var(--success);
+            color: #000;
+        }
+
+        .share-btn:hover {
+            background: #00e87e;
+        }
+
+        .qr-btn {
+            background: var(--warning);
+            color: #000;
+        }
+
+        .qr-btn:hover {
+            background: #ffb732;
+        }
+
+        /* ===== UNIQUE ID DISPLAY ===== */
+        .unique-id-box {
+            background: var(--bg-input);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+
+        .unique-id-box label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .unique-id {
+            font-size: 1.5rem;
+            font-weight: 800;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 3px;
+            color: var(--highlight);
+            user-select: all;
+        }
+
+        /* ===== QR CODE MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 350px;
+            width: 90%;
+            border: 1px solid var(--border);
+        }
+
+        .modal h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+
+        .modal canvas {
+            border-radius: 12px;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            background: var(--highlight);
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+
+        .modal-close:hover {
+            background: #ff5a75;
+        }
+
+        /* ===== DOWNLOAD TAB ===== */
+        .download-section {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid var(--border);
+        }
+
+        .download-section h3 {
+            font-size: 1.3rem;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .download-section > p {
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: var(--highlight);
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-secondary);
+            letter-spacing: 0;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .fetch-btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--success), #00b368);
+            color: #000;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .fetch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px var(--glow-green);
+        }
+
+        .direct-link-section {
+            margin-top: 15px;
+        }
+
+        .direct-link-section label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .direct-link-input {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .direct-link-input:focus {
+            border-color: var(--success);
+        }
+
+        .go-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--accent-light), var(--highlight));
+            color: white;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .go-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* ===== HISTORY ===== */
+        .history-section {
+            margin-top: 30px;
+        }
+
+        .history-section h3 {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .history-item {
+            background: var(--bg-card);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border);
+            transition: all 0.3s;
+        }
+
+        .history-item:hover {
+            border-color: var(--accent-light);
+        }
+
+        .history-item .file-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.1rem;
+        }
+
+        .history-details {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .history-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-meta {
+            color: var(--text-secondary);
+            font-size: 0.78rem;
+            margin-top: 2px;
+        }
+
+        .history-copy {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent);
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .history-copy:hover {
+            background: var(--accent-light);
+        }
+
+        .history-delete {
+            padding: 8px 10px;
+            border: none;
+            border-radius: 8px;
+            background: rgba(233, 69, 96, 0.2);
+            color: var(--highlight);
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .history-delete:hover {
+            background: var(--highlight);
+            color: white;
+        }
+
+        .clear-history {
+            margin-top: 15px;
+            padding: 10px 20px;
+            border: 1px solid var(--highlight);
+            border-radius: 10px;
+            background: transparent;
+            color: var(--highlight);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.85rem;
+        }
+
+        .clear-history:hover {
+            background: var(--highlight);
+            color: white;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 30px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== TOAST NOTIFICATION ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            z-index: 2000;
+            transition: transform 0.4s ease;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast.success { border-color: var(--success); }
+        .toast.error { border-color: var(--highlight); }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: auto;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+        }
+
+        footer a {
+            color: var(--highlight);
+            text-decoration: none;
+        }
+
+        /* ===== LOADING SPINNER ===== */
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            header h1 { font-size: 1.6rem; }
+            .logo { font-size: 2.5rem; }
+            .upload-zone { padding: 35px 20px; }
+            .upload-icon { font-size: 3rem; }
+            .download-link-container { flex-direction: column; }
+            .input-group { flex-direction: column; }
+            .unique-id { font-size: 1.2rem; letter-spacing: 2px; }
+            .tab-btn { font-size: 0.85rem; padding: 12px 10px; }
+            .result-box { padding: 18px; }
+        }
+
+        /* ===== FILE TYPE ICONS ===== */
+        .icon-image { background: linear-gradient(135deg, #e94560, #ff6b81) !important; }
+        .icon-video { background: linear-gradient(135deg, #533483, #8854d0) !important; }
+        .icon-audio { background: linear-gradient(135deg, #ffa502, #ff6348) !important; }
+        .icon-pdf { background: linear-gradient(135deg, #e74c3c, #c0392b) !important; }
+        .icon-zip { background: linear-gradient(135deg, #f39c12, #e67e22) !important; }
+        .icon-doc { background: linear-gradient(135deg, #3498db, #2980b9) !important; }
+        .icon-code { background: linear-gradient(135deg, #2ecc71, #27ae60) !important; }
+        .icon-other { background: linear-gradient(135deg, #95a5a6, #7f8c8d) !important; }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background -->
+    <div class="bg-animation">
+        <div class="circle"></div>
+        <div class="circle"></div>
+        <div class="circle"></div>
+    </div>
+
+    <div class="container">
+
+        <!-- Header -->
+        <header>
+            <span class="logo">📁</span>
+            <h1>PossibilityData</h1>
+            <p>Upload from laptop → Download on phone instantly</p>
+        </header>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('upload')">
+                ⬆️ Upload
+            </button>
+            <button class="tab-btn" onclick="switchTab('download')">
+                ⬇️ Download
+            </button>
+            <button class="tab-btn" onclick="switchTab('history')">
+                📋 History
+            </button>
+        </div>
+
+        <!-- ===== UPLOAD TAB ===== -->
+        <div id="tab-upload" class="tab-content active">
+            <div class="upload-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+                <span class="upload-icon">☁️</span>
+                <h3>Drag & Drop or Click to Upload</h3>
+                <p>Images, Videos, Documents, Archives — Any file up to 10GB</p>
+                <input type="file" id="fileInput">
+            </div>
+
+            <!-- File Preview -->
+            <div class="file-preview" id="filePreview">
+                <div class="file-info">
+                    <div class="file-icon" id="fileIcon">📄</div>
+                    <div class="file-details">
+                        <div class="file-name" id="fileName">filename.jpg</div>
+                        <div class="file-size" id="fileSize">2.4 MB</div>
+                    </div>
+                    <span class="file-type-badge" id="fileType">JPG</span>
+                    <button class="remove-file" onclick="removeFile()">✕</button>
+                </div>
+            </div>
+
+            <!-- Upload Button -->
+            <button class="upload-btn" id="uploadBtn" onclick="uploadFile()">
+                🚀 Upload & Generate Link
+            </button>
+
+            <!-- Progress -->
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-label">
+                    <span id="progressText">Uploading...</span>
+                    <span id="progressPercent">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <!-- Result -->
+            <div class="result-box" id="resultBox">
+                <div class="result-header">
+                    <div class="check-icon">✅</div>
+                    <h3>File Uploaded Successfully!</h3>
+                </div>
+
+                <div class="unique-id-box">
+                    <label>Your Unique Download ID</label>
+                    <div class="unique-id" id="uniqueId">QS-XXXXXX</div>
+                </div>
+
+                <br>
+
+                <div class="download-link-container">
+                    <span class="download-link" id="downloadLink">https://...</span>
+                    <button class="copy-btn" onclick="copyLink()">📋 Copy</button>
+                    <button class="share-btn" onclick="shareLink()">📤 Share</button>
+                    <button class="qr-btn" onclick="showQR()">📱 QR</button>
+                </div>
+
+                <p style="color: var(--text-secondary); font-size: 0.82rem; text-align: center; margin-top: 10px;">
+                    📱 Open this link on your phone or enter the ID in the <strong>Download</strong> tab
+                </p>
+            </div>
+        </div>
+
+        <!-- ===== DOWNLOAD TAB ===== -->
+        <div id="tab-download" class="tab-content">
+            <div class="download-section">
+                <h3>📥 Download Your File</h3>
+                <p>Enter the Unique ID or paste the full download link</p>
+
+                <div class="input-group">
+                    <input type="text" id="codeInput" placeholder="e.g. QS-abc123" 
+                           oninput="this.value = this.value.toUpperCase()">
+                    <button class="fetch-btn" onclick="fetchById()">Fetch</button>
+                </div>
+
+                <div class="direct-link-section">
+                    <label>Or paste the full download URL:</label>
+                    <input type="text" class="direct-link-input" id="urlInput" 
+                           placeholder="https://0x0.st/xxxx.ext">
+                    <button class="go-btn" onclick="fetchByUrl()">🚀 Open Download</button>
+                </div>
+
+                <div style="margin-top: 25px; padding: 20px; background: var(--bg-input); border-radius: 12px; border: 1px solid var(--border);">
+                    <h4 style="margin-bottom: 10px; font-size: 0.95rem;">💡 How it works:</h4>
+                    <ol style="color: var(--text-secondary); font-size: 0.85rem; line-height: 1.8; padding-left: 20px;">
+                        <li>Upload a file from your laptop on the <strong>Upload</strong> tab</li>
+                        <li>Copy the <strong>Unique ID</strong> or <strong>Download Link</strong></li>
+                        <li>Open this website on your phone</li>
+                        <li>Go to the <strong>Download</strong> tab and paste the ID or link</li>
+                        <li>Download your file! 🎉</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== HISTORY TAB ===== -->
+        <div id="tab-history" class="tab-content">
+            <div class="history-section">
+                <h3>📋 Upload History</h3>
+                <div class="history-list" id="historyList">
+                    <div class="empty-history">No files uploaded yet. Start by uploading a file!</div>
+                </div>
+                <button class="clear-history" id="clearHistoryBtn" style="display:none;" onclick="clearHistory()">
+                    🗑️ Clear All History
+                </button>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>🔒 Files are stored temporarily on <a href="https://0x0.st" target="_blank">0x0.st</a> — free & anonymous</p>
+            <p style="margin-top: 5px;">PossibilityData © 2026 — No login, no signup, no limits</p>
+        </footer>
+    </div>
+
+    <!-- QR Code Modal -->
+    <div class="modal-overlay" id="qrModal">
+        <div class="modal">
+            <h3>📱 Scan to Download on Phone</h3>
+            <canvas id="qrCanvas" width="250" height="250"></canvas>
+            <br>
+            <button class="modal-close" onclick="closeQR()">Close</button>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== GLOBAL STATE =====
+        let selectedFile = null;
+        let uploadHistory = JSON.parse(localStorage.getItem('possibilitydata_history') || '[]');
+        const API_URL = 'https://0x0.st'; // Free file hosting API
+
+        // ===== INIT =====
+        document.addEventListener('DOMContentLoaded', () => {
+            renderHistory();
+            setupDragDrop();
+        });
+
+        // ===== TAB SWITCHING =====
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+
+        // ===== DRAG & DROP =====
+        function setupDragDrop() {
+            const dropZone = document.getElementById('dropZone');
+
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
+            });
+
+            dropZone.addEventListener('dragenter', () => dropZone.classList.add('dragover'));
+            dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+            dropZone.addEventListener('drop', e => {
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            document.getElementById('fileInput').addEventListener('change', e => {
+                if (e.target.files.length) {
+                    handleFile(e.target.files[0]);
+                }
+            });
+        }
+
+        // ===== FILE HANDLING =====
+        function handleFile(file) {
+            selectedFile = file;
+
+            // Update preview
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+
+            const ext = file.name.split('.').pop().toLowerCase();
+            document.getElementById('fileType').textContent = ext.toUpperCase();
+
+            // Set icon
+            const iconEl = document.getElementById('fileIcon');
+            iconEl.textContent = getFileIcon(ext);
+            iconEl.className = 'file-icon ' + getIconClass(ext);
+
+            // Show elements
+            document.getElementById('filePreview').classList.add('show');
+            document.getElementById('uploadBtn').classList.add('ready');
+            document.getElementById('resultBox').classList.remove('show');
+        }
+
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('fileInput').value = '';
+            document.getElementById('filePreview').classList.remove('show');
+            document.getElementById('uploadBtn').classList.remove('ready');
+            document.getElementById('resultBox').classList.remove('show');
+            document.getElementById('progressContainer').classList.remove('show');
+        }
+
+        // ===== UPLOAD =====
+        async function uploadFile() {
+            if (!selectedFile) return;
+
+            const btn = document.getElementById('uploadBtn');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const progressPercent = document.getElementById('progressPercent');
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Uploading...';
+            progressContainer.classList.add('show');
+
+            try {
+                const formData = new FormData();
+                formData.append('file', selectedFile);
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', e => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        progressFill.style.width = percent + '%';
+                        progressPercent.textContent = percent + '%';
+                        progressText.textContent = `Uploading... ${formatFileSize(e.loaded)} / ${formatFileSize(e.total)}`;
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    if (xhr.status === 200) {
+                        const downloadUrl = xhr.responseText.trim();
+                        const uniqueId = generateUniqueId();
+
+                        // Show result
+                        document.getElementById('downloadLink').textContent = downloadUrl;
+                        document.getElementById('uniqueId').textContent = uniqueId;
+                        document.getElementById('resultBox').classList.add('show');
+
+                        // Save to history
+                        const historyItem = {
+                            id: uniqueId,
+                            name: selectedFile.name,
+                            size: formatFileSize(selectedFile.size),
+                            url: downloadUrl,
+                            type: selectedFile.name.split('.').pop().toUpperCase(),
+                            date: new Date().toLocaleDateString('en-US', {
+                                month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })
+                        };
+
+                        uploadHistory.unshift(historyItem);
+                        localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
+                        renderHistory();
+
+                        showToast('✅ File uploaded successfully!', 'success');
+                    } else {
+                        showToast('❌ Upload failed. Please try again.', 'error');
+                    }
+
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Upload & Generate Link';
+                });
+
+                xhr.addEventListener('error', () => {
+                    showToast('❌ Network error. Check your connection.', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '🚀 Upload & Generate Link';
+                });
+
+                xhr.open('POST', API_URL);
+                xhr.send(formData);
+
+            } catch (error) {
+                showToast('❌ Error: ' + error.message, 'error');
+                btn.disabled = false;
+                btn.innerHTML = '🚀 Upload & Generate Link';
+            }
+        }
+
+        // ===== DOWNLOAD FUNCTIONS =====
+        function fetchById() {
+            const code = document.getElementById('codeInput').value.trim();
+            if (!code) {
+                showToast('⚠️ Please enter a valid ID', 'error');
+                return;
+            }
+
+            // Search in history first
+            const found = uploadHistory.find(h => h.id.toUpperCase() === code.toUpperCase());
+            if (found) {
+                window.open(found.url, '_blank');
+                showToast('📥 Opening download...', 'success');
+                return;
+            }
+
+            showToast('⚠️ ID not found in local history. Please paste the full URL instead.', 'error');
+        }
+
+        function fetchByUrl() {
+            const url = document.getElementById('urlInput').value.trim();
+            if (!url) {
+                showToast('⚠️ Please paste a download URL', 'error');
+                return;
+            }
+            if (!url.startsWith('http')) {
+                showToast('⚠️ Invalid URL', 'error');
+                return;
+            }
+            window.open(url, '_blank');
+            showToast('📥 Opening download...', 'success');
+        }
+
+        // ===== COPY & SHARE =====
+        function copyLink() {
+            const link = document.getElementById('downloadLink').textContent;
+            navigator.clipboard.writeText(link).then(() => {
+                showToast('📋 Link copied to clipboard!', 'success');
+            }).catch(() => {
+                // Fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = link;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                showToast('📋 Link copied!', 'success');
+            });
+        }
+
+        async function shareLink() {
+            const link = document.getElementById('downloadLink').textContent;
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Possibility Data ',
+                        text: 'Download your file from possibilitydata',
+                        url: link
+                    });
+                } catch (e) {
+                    copyLink();
+                }
+            } else {
+                copyLink();
+            }
+        }
+
+        // ===== QR CODE =====
+        function showQR() {
+            const link = document.getElementById('downloadLink').textContent;
+            const canvas = document.getElementById('qrCanvas');
+            generateQRCode(canvas, link);
+            document.getElementById('qrModal').classList.add('show');
+        }
+
+        function closeQR() {
+            document.getElementById('qrModal').classList.remove('show');
+        }
+
+        // Simple QR Code Generator (minimal implementation)
+        function generateQRCode(canvas, text) {
+            const ctx = canvas.getContext('2d');
+            const size = canvas.width;
+
+            // Use a public QR API as fallback since we can't include a full QR library inline easily
+            const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}&bgcolor=1a1a2e&color=ffffff&margin=10`;
+
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                ctx.drawImage(img, 0, 0, size, size);
+            };
+            img.src = qrApiUrl;
+        }
+
+        // ===== HISTORY =====
+        function renderHistory() {
+            const list = document.getElementById('historyList');
+            const clearBtn = document.getElementById('clearHistoryBtn');
+
+            if (uploadHistory.length === 0) {
+                list.innerHTML = '<div class="empty-history">No files uploaded yet. Start by uploading a file!</div>';
+                clearBtn.style.display = 'none';
+                return;
+            }
+
+            clearBtn.style.display = 'block';
+            list.innerHTML = uploadHistory.map((item, index) => `
+                <div class="history-item">
+                    <div class="file-icon ${getIconClass(item.type.toLowerCase())}">
+                        ${getFileIcon(item.type.toLowerCase())}
+                    </div>
+                    <div class="history-details">
+                        <div class="history-name">${item.name}</div>
+                        <div class="history-meta">${item.size} • ${item.date} • ID: ${item.id}</div>
+                    </div>
+                    <button class="history-copy" onclick="copyHistoryLink(${index})">📋</button>
+                    <button class="history-delete" onclick="deleteHistoryItem(${index})">🗑️</button>
+                </div>
+            `).join('');
+        }
+
+        function copyHistoryLink(index) {
+            const item = uploadHistory[index];
+            navigator.clipboard.writeText(item.url).then(() => {
+                showToast('📋 Link copied!', 'success');
+            }).catch(() => {
+                showToast('📋 Link copied!', 'success');
+            });
+        }
+
+        function deleteHistoryItem(index) {
+            uploadHistory.splice(index, 1);
+            localStorage.setItem('possibilitydata_history', JSON.stringify(uploadHistory));
+            renderHistory();
+            showToast('🗑️ Removed from history', 'success');
+        }
+
+        function clearHistory() {
+            if (confirm('Clear all upload history?')) {
+                uploadHistory = [];
+                localStorage.setItem('possibilitydata_history', '[]');
+                renderHistory();
+                showToast('🗑️ History cleared', 'success');
+            }
+        }
+
+        // ===== UTILITIES =====
+        function generateUniqueId() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            let result = 'QS-';
+            for (let i = 0; i < 6; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function getFileIcon(ext) {
+            const icons = {
+                jpg: '🖼️', jpeg: '🖼️', png: '🖼️', gif: '🖼️', svg: '🖼️', webp: '🖼️', bmp: '🖼️', ico: '🖼️',
+                mp4: '🎬', avi: '🎬', mov: '🎬', mkv: '🎬', webm: '🎬', flv: '🎬', wmv: '🎬',
+                mp3: '🎵', wav: '🎵', flac: '🎵', aac: '🎵', ogg: '🎵', wma: '🎵',
+                pdf: '📕', doc: '📘', docx: '📘', txt: '📝', rtf: '📝',
+                xls: '📊', xlsx: '📊', csv: '📊',
+                ppt: '📙', pptx: '📙',
+                zip: '📦', rar: '📦', '7z': '📦', tar: '📦', gz: '📦',
+                js: '💻', html: '💻', css: '💻', py: '💻', java: '💻', cpp: '💻',
+                apk: '📱', exe: '⚙️', dmg: '💿', iso: '💿',
+            };
+            return icons[ext] || '📄';
+        }
+
+        function getIconClass(ext) {
+            const imageExts = ['jpg', 'jpeg', 'png', 'gif', 'svg', 'webp', 'bmp', 'ico'];
+            const videoExts = ['mp4', 'avi', 'mov', 'mkv', 'webm', 'flv', 'wmv'];
+            const audioExts = ['mp3', 'wav', 'flac', 'aac', 'ogg', 'wma'];
+            const docExts = ['pdf'];
+            const zipExts = ['zip', 'rar', '7z', 'tar', 'gz'];
+            const docFileExts = ['doc', 'docx', 'txt', 'rtf', 'xls', 'xlsx', 'csv', 'ppt', 'pptx'];
+            const codeExts = ['js', 'html', 'css', 'py', 'java', 'cpp'];
+
+            if (imageExts.includes(ext)) return 'icon-image';
+            if (videoExts.includes(ext)) return 'icon-video';
+            if (audioExts.includes(ext)) return 'icon-audio';
+            if (docExts.includes(ext)) return 'icon-pdf';
+            if (zipExts.includes(ext)) return 'icon-zip';
+            if (docFileExts.includes(ext)) return 'icon-doc';
+            if (codeExts.includes(ext)) return 'icon-code';
+            return 'icon-other';
+        }
+
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type + ' show';
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Close modal on overlay click
+        document.getElementById('qrModal').addEventListener('click', e => {
+            if (e.target === document.getElementById('qrModal')) {
+                closeQR();
+            }
+        });
+
+        // Keyboard shortcut: Escape to close modal
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeQR();
+        });
+    </script>
+</body>
+</html>
