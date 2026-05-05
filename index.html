@@ -132,6 +132,14 @@
         .download-btn { flex: 1; min-width: 200px; padding: 16px; border: none; border-radius: 14px; font-size: 1.1rem; font-weight: 700; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; background: linear-gradient(135deg, var(--success), var(--accent-light)); color: #0a0f0a; box-shadow: 0 4px 20px var(--glow-green); }
         .download-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 30px var(--glow-green); }
         .download-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+        .download-btn.secondary { background: var(--bg-card); color: var(--text-primary); border: 2px solid var(--border); box-shadow: none; }
+        .download-btn.secondary:hover { background: var(--bg-secondary); border-color: var(--highlight); }
+        
+        .download-progress { margin-top: 15px; padding: 15px; background: var(--bg-card); border-radius: 12px; display: none; }
+        .download-progress.show { display: block; }
+        .progress-info { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 0.9rem; }
+        .progress-bar { height: 6px; background: var(--bg-secondary); border-radius: 3px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success)); border-radius: 3px; width: 0%; transition: width 0.3s ease; }
         
         .history-section { margin-top: 30px; }
         .history-section h3 { font-size: 1.1rem; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
@@ -160,179 +168,6 @@
         .spinner { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255, 255, 255, 0.3); border-top-color: white; border-radius: 50%; animation: spin 0.8s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
         
-        /* ===== DOWNLOAD OVERLAY STYLES ===== */
-        .download-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(10, 15, 10, 0.95);
-            z-index: 3000;
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(15px);
-            animation: fadeIn 0.3s ease;
-        }
-        .download-overlay.show { display: flex; }
-        
-        .download-overlay-content {
-            background: var(--bg-card);
-            border-radius: 24px;
-            padding: 40px;
-            max-width: 90%;
-            width: 600px;
-            border: 2px solid var(--highlight);
-            box-shadow: 0 0 60px var(--glow-green);
-            text-align: center;
-            position: relative;
-        }
-        
-        .overlay-header {
-            margin-bottom: 30px;
-        }
-        .overlay-header h2 {
-            color: var(--success);
-            font-size: 1.8rem;
-            margin-bottom: 10px;
-        }
-        .overlay-header p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-        
-        .overlay-iframe-container {
-            width: 100%;
-            height: 400px;
-            border-radius: 16px;
-            overflow: hidden;
-            border: 2px solid var(--border);
-            background: var(--bg-primary);
-            position: relative;
-            margin-bottom: 25px;
-        }
-        
-        .overlay-iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            display: block;
-        }
-        
-        .overlay-loading {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: var(--bg-primary);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-        }
-        .overlay-loading.hide { display: none; }
-        .overlay-loading .spinner {
-            width: 50px;
-            height: 50px;
-            border-width: 4px;
-            margin-bottom: 15px;
-        }
-        .overlay-loading p {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-        }
-        
-        .overlay-progress {
-            background: var(--bg-input);
-            border-radius: 12px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-        .progress-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-        }
-        .progress-row .label { color: var(--text-secondary); }
-        .progress-row .value { color: var(--success); font-weight: 600; }
-        .progress-bar-container {
-            height: 10px;
-            background: var(--bg-secondary);
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        .progress-bar-container .fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--highlight), var(--success));
-            border-radius: 5px;
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-        
-        .overlay-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-        }
-        .overlay-btn {
-            padding: 14px 32px;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .overlay-btn.primary {
-            background: linear-gradient(135deg, var(--success), var(--accent-light));
-            color: #0a0f0a;
-        }
-        .overlay-btn.primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 30px var(--glow-green);
-        }
-        .overlay-btn.secondary {
-            background: var(--bg-input);
-            color: var(--text-primary);
-            border: 2px solid var(--border);
-        }
-        .overlay-btn.secondary:hover {
-            border-color: var(--highlight);
-            background: var(--bg-secondary);
-        }
-        .overlay-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .overlay-status {
-            margin-top: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            display: none;
-        }
-        .overlay-status.show { display: block; }
-        .overlay-status.success {
-            background: rgba(0, 212, 116, 0.2);
-            border: 1px solid var(--success);
-            color: var(--success);
-        }
-        .overlay-status.error {
-            background: rgba(233, 69, 96, 0.2);
-            border: 1px solid var(--highlight);
-            color: var(--highlight);
-        }
-        
         @media (max-width: 600px) {
             header h1 { font-size: 1.6rem; } .logo { font-size: 2.5rem; }
             .upload-zone { padding: 35px 20px; } .upload-icon { font-size: 3rem; }
@@ -344,10 +179,6 @@
             .preview-image { max-height: 200px; }
             .download-actions { flex-direction: column; }
             .download-btn { width: 100%; }
-            .download-overlay-content { padding: 25px; }
-            .overlay-iframe-container { height: 300px; }
-            .overlay-actions { flex-direction: column; }
-            .overlay-btn { width: 100%; justify-content: center; }
         }
         
         .icon-image { background: linear-gradient(135deg, #00d474, #00e87e) !important; }
@@ -480,8 +311,8 @@
                 <h3>📥 Download Your File</h3>
                 <p>Enter the Unique ID or paste the full download link</p>
                 
-                <div class="alert-box info show" id="downloadInfo">
-                    💡 <strong>Seamless Download:</strong> Files download within an overlay — no page redirects!
+                <div class="alert-box info" id="downloadInfo">
+                    💡 <strong>Direct Download:</strong> Files are downloaded directly through this page — no redirects to external sites!
                 </div>
                 
                 <div class="input-group">
@@ -506,9 +337,22 @@
                     <img class="preview-image" id="previewImage" alt="File preview">
                     
                     <div class="download-actions">
-                        <button class="download-btn" id="downloadBtn" onclick="triggerOverlayDownload()">
-                            📥 Download with Overlay
+                        <button class="download-btn" id="downloadBtn" onclick="triggerDirectDownload()">
+                            📥 Download Now
                         </button>
+                        <button class="download-btn secondary" onclick="openInNewTab()">
+                            🔗 Open Link
+                        </button>
+                    </div>
+                    
+                    <div class="download-progress" id="downloadProgress">
+                        <div class="progress-info">
+                            <span id="progressStatus">Downloading...</span>
+                            <span id="progressPercentDownload">0%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-fill" id="progressBarDownload"></div>
+                        </div>
                     </div>
                 </div>
                 
@@ -519,7 +363,7 @@
                         <li>Copy the <strong>Unique ID</strong> or <strong>Download Link</strong></li>
                         <li>Open this website on your phone</li>
                         <li>Go to the <strong>Download</strong> tab and paste the ID or link</li>
-                        <li>Click <strong>"Download with Overlay"</strong> — file downloads in a popup overlay! 🎉</li>
+                        <li>Click <strong>"Download Now"</strong> button — file downloads directly! 🎉</li>
                     </ol>
                 </div>
             </div>
@@ -537,48 +381,9 @@
         </div>
 
         <footer>
-            <p>🔒 Files stored per your chosen backend — <strong>Overlay downloads, no redirects</strong></p>
+            <p>🔒 Files stored per your chosen backend — <strong>Direct downloads, no redirects</strong></p>
             <p style="margin-top: 5px;">PossibilityData © 2026 — Privacy-first, no login, no tracking</p>
         </footer>
-    </div>
-
-    <!-- ===== DOWNLOAD OVERLAY ===== -->
-    <div class="download-overlay" id="downloadOverlay">
-        <div class="download-overlay-content">
-            <div class="overlay-header">
-                <h2>📥 Downloading File...</h2>
-                <p id="overlayFileName">filename.jpg</p>
-            </div>
-            
-            <div class="overlay-iframe-container">
-                <div class="overlay-loading" id="overlayLoading">
-                    <div class="spinner"></div>
-                    <p>Connecting to server...</p>
-                </div>
-                <iframe class="overlay-iframe" id="downloadIframe" sandbox="allow-downloads"></iframe>
-            </div>
-            
-            <div class="overlay-progress">
-                <div class="progress-row">
-                    <span class="label">Status:</span>
-                    <span class="value" id="overlayStatus">Initializing...</span>
-                </div>
-                <div class="progress-bar-container">
-                    <div class="fill" id="overlayProgressBar"></div>
-                </div>
-            </div>
-            
-            <div class="overlay-status" id="overlayMessage"></div>
-            
-            <div class="overlay-actions">
-                <button class="overlay-btn primary" id="overlayCloseBtn" onclick="closeDownloadOverlay()" style="display:none;">
-                    ✅ Close & Return
-                </button>
-                <button class="overlay-btn secondary" onclick="cancelDownload()">
-                    ✕ Cancel
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- QR Modal -->
@@ -643,8 +448,6 @@
         let currentBackend = 'tmpfiles';
         let currentDownloadUrl = null;
         let currentFilename = 'download';
-        let downloadTimeout = null;
-        let overlayAutoCloseTimer = null;
 
         // ===== INIT =====
         document.addEventListener('DOMContentLoaded', () => {
@@ -659,6 +462,7 @@
             if (downloadUrl) {
                 document.getElementById('urlInput').value = decodeURIComponent(downloadUrl);
                 fetchByUrl();
+                // Clean URL
                 window.history.replaceState({}, document.title, window.location.pathname);
             }
         });
@@ -877,21 +681,32 @@
             try {
                 currentDownloadUrl = url;
                 
+                // Extract filename from URL or use known filename
                 let filename = knownFilename;
                 if (!filename) {
                     const urlObj = new URL(url);
                     const pathname = urlObj.pathname;
                     filename = pathname.split('/').pop() || 'downloaded-file';
                     
+                    // For tmpfiles, try to get better filename
                     if (url.includes('tmpfiles.org')) {
-                        const match = url.match(/\/dl\/\d+\/(.+)$/);
-                        if (match) filename = match[1];
+                        try {
+                            const response = await fetch(url.replace('/d/', '/dl/'), { method: 'HEAD', mode: 'no-cors' });
+                            // If we can't get headers, parse from URL
+                            const match = url.match(/\/dl\/\d+\/(.+)$/);
+                            if (match) filename = match[1];
+                        } catch (e) {
+                            const match = url.match(/\/dl\/\d+\/(.+)$/);
+                            if (match) filename = match[1];
+                        }
                     }
                 }
                 
                 currentFilename = filename;
                 const ext = filename.split('.').pop().toLowerCase();
+                const fileType = getFileTypeCategory(ext);
                 
+                // Show preview
                 document.getElementById('previewName').textContent = filename;
                 document.getElementById('previewMeta').textContent = `${ext.toUpperCase()} • Ready to download`;
                 
@@ -899,6 +714,7 @@
                 previewIcon.textContent = getFileIcon(ext);
                 previewIcon.className = 'preview-icon ' + getIconClass(ext);
                 
+                // Show image preview if applicable
                 const previewImage = document.getElementById('previewImage');
                 const imageExts = ['jpg','jpeg','png','gif','svg','webp','bmp'];
                 if (imageExts.includes(ext)) {
@@ -911,124 +727,86 @@
                 }
                 
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '📥 Download with Overlay';
+                downloadBtn.innerHTML = '📥 Download Now';
                 showToast('✅ File ready for download!', 'success');
                 
             } catch (error) {
                 showToast(`⚠️ Error preparing download: ${error.message}`, 'error');
                 downloadBtn.disabled = false;
-                downloadBtn.innerHTML = '📥 Download with Overlay';
+                downloadBtn.innerHTML = '📥 Download Now';
             } finally {
                 if (fetchBtn) fetchBtn.disabled = false;
                 if (fetchByIdBtn) fetchByIdBtn.disabled = false;
             }
         }
 
-        // ===== OVERLAY DOWNLOAD SYSTEM =====
-        function triggerOverlayDownload() {
+        async function triggerDirectDownload() {
             if (!currentDownloadUrl) {
                 showToast('⚠️ No file URL available', 'error');
                 return;
             }
             
-            // Show overlay
-            const overlay = document.getElementById('downloadOverlay');
-            const iframe = document.getElementById('downloadIframe');
-            const loading = document.getElementById('overlayLoading');
-            const statusEl = document.getElementById('overlayStatus');
-            const progressBar = document.getElementById('overlayProgressBar');
-            const messageEl = document.getElementById('overlayMessage');
-            const closeBtn = document.getElementById('overlayCloseBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const progressDiv = document.getElementById('downloadProgress');
+            const progressBar = document.getElementById('progressBarDownload');
+            const progressPercent = document.getElementById('progressPercentDownload');
+            const progressStatus = document.getElementById('progressStatus');
             
-            // Reset overlay state
-            overlay.classList.add('show');
-            loading.classList.remove('hide');
-            messageEl.classList.remove('show', 'success', 'error');
-            closeBtn.style.display = 'none';
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<span class="spinner"></span> Downloading...';
+            progressDiv.classList.add('show');
             progressBar.style.width = '0%';
-            statusEl.textContent = 'Connecting to server...';
-            document.getElementById('overlayFileName').textContent = currentFilename;
+            progressPercent.textContent = '0%';
+            progressStatus.textContent = 'Connecting...';
             
-            // Convert to dl URL for tmpfiles
-            let downloadUrl = currentDownloadUrl;
-            if (downloadUrl.includes('tmpfiles.org')) {
-                downloadUrl = downloadUrl.replace('/d/', '/dl/');
-            }
-            
-            // Set iframe src to trigger download
-            iframe.src = downloadUrl;
-            
-            // Progress simulation
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += Math.random() * 15;
-                if (progress > 90) progress = 90;
-                progressBar.style.width = progress + '%';
-                
-                if (progress < 30) {
-                    statusEl.textContent = 'Establishing connection...';
-                } else if (progress < 60) {
-                    statusEl.textContent = 'Downloading file...';
-                } else if (progress < 90) {
-                    statusEl.textContent = 'Finalizing download...';
+            try {
+                // For tmpfiles.org and similar services, use direct link approach
+                // Convert /d/ to /dl/ for proper download
+                let downloadUrl = currentDownloadUrl;
+                if (downloadUrl.includes('tmpfiles.org')) {
+                    downloadUrl = downloadUrl.replace('/d/', '/dl/');
                 }
-            }, 500);
-            
-            // Auto-close after 5 seconds (download should have started)
-            if (overlayAutoCloseTimer) clearTimeout(overlayAutoCloseTimer);
-            overlayAutoCloseTimer = setTimeout(() => {
-                clearInterval(progressInterval);
+                
+                progressStatus.textContent = 'Starting download...';
+                progressBar.style.width = '30%';
+                progressPercent.textContent = '30%';
+                
+                // Create download link and trigger
+                const a = document.createElement('a');
+                a.href = downloadUrl;
+                a.download = currentFilename || '';
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
                 progressBar.style.width = '100%';
-                statusEl.textContent = 'Download started!';
-                loading.classList.add('hide');
+                progressPercent.textContent = '100%';
+                progressStatus.textContent = 'Download started!';
                 
-                messageEl.textContent = '✅ Your download has started! The file should appear in your downloads folder.';
-                messageEl.classList.add('show', 'success');
-                closeBtn.style.display = 'inline-flex';
+                setTimeout(() => {
+                    progressDiv.classList.remove('show');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = '📥 Download Now';
+                }, 1500);
                 
-                showToast('📥 Download started successfully!', 'success');
-            }, 5000);
-            
-            // Handle iframe load error
-            iframe.onerror = () => {
-                clearInterval(progressInterval);
-                statusEl.textContent = 'Error loading file';
-                messageEl.textContent = '❌ Could not load the file. Try downloading directly.';
-                messageEl.classList.add('show', 'error');
-                loading.classList.add('hide');
-                closeBtn.style.display = 'inline-flex';
-            };
+                showToast('📥 Download started! Check your downloads folder.', 'success');
+                
+            } catch (error) {
+                showToast(`❌ Download failed: ${error.message}`, 'error');
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '📥 Download Now';
+                progressDiv.classList.remove('show');
+            }
         }
 
-        function closeDownloadOverlay() {
-            const overlay = document.getElementById('downloadOverlay');
-            const iframe = document.getElementById('downloadIframe');
-            
-            if (overlayAutoCloseTimer) clearTimeout(overlayAutoCloseTimer);
-            
-            overlay.classList.remove('show');
-            iframe.src = 'about:blank';
-            
-            // Reset buttons
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.disabled = false;
-            downloadBtn.innerHTML = '📥 Download with Overlay';
-        }
-
-        function cancelDownload() {
-            if (overlayAutoCloseTimer) clearTimeout(overlayAutoCloseTimer);
-            
-            const overlay = document.getElementById('downloadOverlay');
-            const iframe = document.getElementById('downloadIframe');
-            
-            overlay.classList.remove('show');
-            iframe.src = 'about:blank';
-            
-            showToast('Download cancelled', 'error');
-            
-            const downloadBtn = document.getElementById('downloadBtn');
-            downloadBtn.disabled = false;
-            downloadBtn.innerHTML = '📥 Download with Overlay';
+        function openInNewTab() {
+            if (!currentDownloadUrl) {
+                showToast('⚠️ No file URL available', 'error');
+                return;
+            }
+            window.open(currentDownloadUrl, '_blank');
+            showToast('🔗 Link opened in new tab', 'success');
         }
 
         function getFileTypeCategory(ext) {
@@ -1068,6 +846,7 @@
         function showQR() {
             const link = document.getElementById('downloadLink').textContent;
             const canvas = document.getElementById('qrCanvas');
+            // Encode URL with parameter for auto-download
             const encodedUrl = `${window.location.origin}${window.location.pathname}?url=${encodeURIComponent(link)}`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(encodedUrl)}&bgcolor=1a2e1a&color=00d474&margin=10`;
             const img = new Image();
@@ -1165,7 +944,7 @@
             setTimeout(() => toast.classList.remove('show'), 3000);
         }
         document.getElementById('qrModal').addEventListener('click', e => { if (e.target.id === 'qrModal') closeQR(); });
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeDownloadOverlay(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeQR(); });
     </script>
 </body>
 </html>
