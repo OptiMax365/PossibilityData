@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📁 POSSIBILITYDATA — Secure File Share</title>
     <style>
-        /* ===== GREEN THEME UPDATE ===== */
+        /* ===== GREEN THEME ===== */
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
             --bg-primary: #0a0f0a; --bg-secondary: #0f1a0f; --bg-card: #1a2e1a;
@@ -188,7 +188,7 @@
     <div class="receiver-container" id="receiverContainer">
         <div class="receiver-icon">📥</div>
         <h1 class="receiver-title">File Ready for Download</h1>
-        <p class="receiver-desc" id="receiverDesc">Tap the button below to download your file securely</p>
+        <p class="receiver-desc" id="receiverDesc">Tap the button below to download your file directly to your device</p>
         
         <div class="file-preview-large">
             <div class="file-icon-large" id="receiverFileIcon">📄</div>
@@ -196,8 +196,8 @@
             <div class="file-meta" id="receiverFileMeta">2.4 MB • Image</div>
         </div>
         
-        <button class="download-btn-large" id="receiverDownloadBtn" onclick="triggerDownload()">
-            ⬇️ Download File
+        <button class="download-btn-large" id="receiverDownloadBtn" onclick="triggerDirectDownload()">
+            ⬇️ Download to Device
         </button>
         
         <div class="receiver-footer">
@@ -363,23 +363,18 @@
     <script>
         // ===== CHECK FOR RECEIVER MODE ON LOAD =====
         document.addEventListener('DOMContentLoaded', () => {
-            // Check URL hash for receiver mode: #receiver?url=ENCODED_URL
             const hash = window.location.hash;
             if (hash.startsWith('#receiver?url=')) {
-                const encodedUrl = hash.substring(14); // remove '#receiver?url='
+                const encodedUrl = hash.substring(14);
                 const downloadUrl = decodeURIComponent(encodedUrl);
                 initReceiverMode(downloadUrl);
                 return;
             }
-            
-            // Also check for legacy format: #download/URL
             if (hash.startsWith('#download/')) {
                 const downloadUrl = decodeURIComponent(hash.substring(10));
                 initReceiverMode(downloadUrl);
                 return;
             }
-            
-            // Normal app initialization
             loadConfig();
             renderHistory();
             setupDragDrop();
@@ -388,96 +383,123 @@
 
         // ===== RECEIVER MODE INITIALIZATION =====
         function initReceiverMode(downloadUrl) {
-            // Switch to receiver mode UI
             document.body.classList.add('receiver-mode');
             
-            // Parse file info from URL (best effort)
             const fileName = extractFileNameFromUrl(downloadUrl);
             const fileExt = fileName.split('.').pop().toLowerCase();
-            const fileSize = 'File'; // We don't have size info from URL alone
+            const fileSize = 'File';
             
-            // Update receiver UI
             document.getElementById('receiverFileName').textContent = fileName;
             document.getElementById('receiverFileMeta').textContent = `${fileSize} • ${fileExt.toUpperCase()}`;
             document.getElementById('receiverFileIcon').textContent = getFileIcon(fileExt);
             document.getElementById('receiverFileIcon').className = 'file-icon-large ' + getIconClass(fileExt);
             
-            // Store the download URL for the button
-            document.getElementById('receiverDownloadBtn').dataset.url = downloadUrl;
+            // Store BOTH original and direct download URLs
+            const directUrl = convertToDirectDownload(downloadUrl);
+            document.getElementById('receiverDownloadBtn').dataset.originalUrl = downloadUrl;
+            document.getElementById('receiverDownloadBtn').dataset.directUrl = directUrl;
+            document.getElementById('receiverDownloadBtn').dataset.filename = fileName;
             
-            // Update page title
             document.title = `📥 Download: ${fileName} • PossibilityData`;
         }
         
-        // ===== TRIGGER DOWNLOAD IN RECEIVER MODE =====
-        async function triggerDownload() {
+        // ===== CONVERT URL TO DIRECT DOWNLOAD FORMAT =====
+        function convertToDirectDownload(url) {
+            // tmpfiles.org: /d/ shows page, /dl/ is direct download
+            if (url.includes('tmpfiles.org')) {
+                return url.replace('/d/', '/dl/');
+            }
+            // storage.to and others: try adding ?download=1 parameter
+            if (!url.includes('?')) {
+                return url + '?download=1';
+            }
+            return url;
+        }
+        
+        // ===== TRIGGER DIRECT DOWNLOAD (NO BLUE PAGE) =====
+        async function triggerDirectDownload() {
             const btn = document.getElementById('receiverDownloadBtn');
-            const downloadUrl = btn.dataset.url;
+            const originalUrl = btn.dataset.originalUrl;
+            const directUrl = btn.dataset.directUrl;
+            const fileName = btn.dataset.filename || 'downloaded-file';
             
-            if (!downloadUrl) {
+            if (!directUrl) {
                 showToast('⚠️ No download URL found', 'error');
                 return;
             }
             
-            // Show loading state
+            // Show downloading state
             const originalText = btn.innerHTML;
             btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Preparing...';
+            btn.innerHTML = '<span class="spinner"></span> Downloading...';
+            showToast('📥 Starting download...', 'success');
             
             try {
-                // For tmpfiles.org and similar services, we can often just redirect
-                // For CORS-enabled servers, we could fetch and trigger download
-                // We'll use a smart approach: try direct download first
-                
-                // Special handling for tmpfiles.org (convert /d/ to direct download)
-                let finalUrl = downloadUrl;
-                if (downloadUrl.includes('tmpfiles.org')) {
-                    finalUrl = downloadUrl.replace('/d/', '/dl/');
+                // STRATEGY 1: Try fetch as blob (works if CORS allows)
+                try {
+                    const response = await fetch(directUrl, { mode: 'cors' });
+                    if (response.ok) {
+                        const blob = await response.blob();
+                        const blobUrl = URL.createObjectURL(blob);
+                        triggerBlobDownload(blobUrl, fileName);
+                        URL.revokeObjectURL(blobUrl);
+                        showToast('✅ Download complete!', 'success');
+                        document.getElementById('receiverDesc').textContent = '✓ File saved to your device!';
+                        setTimeout(() => { btn.disabled = false; btn.innerHTML = originalText; }, 2000);
+                        return;
+                    }
+                } catch (e) {
+                    // CORS failed, fall through to strategy 2
+                    console.log('CORS fetch failed, trying anchor method:', e);
                 }
                 
-                // Try to trigger download via anchor tag (works for most cases)
+                // STRATEGY 2: Use anchor tag with download attribute + direct URL
                 const a = document.createElement('a');
-                a.href = finalUrl;
-                a.download = ''; // Let server suggest filename
+                a.href = directUrl;
+                a.download = fileName; // Hint to browser to download
+                a.target = '_self'; // Stay on same page
+                a.style.display = 'none';
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 
-                showToast('✅ Download started!', 'success');
-                
-                // Show confirmation after delay
+                // Show success after brief delay (can't detect actual completion)
                 setTimeout(() => {
-                    document.getElementById('receiverDesc').textContent = '✓ Your download should be starting... Check your browser\'s download bar!';
+                    showToast('✅ Download started! Check your downloads folder', 'success');
+                    document.getElementById('receiverDesc').textContent = '✓ Your download should be starting...';
+                    btn.disabled = false;
+                    btn.innerHTML = originalText;
                 }, 1500);
                 
             } catch (error) {
                 console.error('Download error:', error);
-                showToast('⚠️ Download blocked. Try long-pressing the button and "Open in new tab"', 'error');
-                // Fallback: open in new tab
-                window.open(downloadUrl, '_blank');
-            } finally {
-                // Restore button after delay
-                setTimeout(() => {
-                    btn.disabled = false;
-                    btn.innerHTML = originalText;
-                }, 2000);
+                // STRATEGY 3: Last resort - open in new tab (may show blue page but ensures access)
+                window.open(originalUrl, '_blank');
+                showToast('⚠️ Opening in new tab as fallback', 'error');
+                btn.disabled = false;
+                btn.innerHTML = originalText;
             }
+        }
+        
+        // ===== HELPER: Trigger blob download =====
+        function triggerBlobDownload(blobUrl, fileName) {
+            const a = document.createElement('a');
+            a.href = blobUrl;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
         
         // ===== HELPER: Extract filename from URL =====
         function extractFileNameFromUrl(url) {
             try {
-                // Try to get filename from URL path
                 const pathname = new URL(url).pathname;
                 const filename = pathname.split('/').pop();
-                if (filename && filename.includes('.')) return filename;
-                
-                // Fallback: use query parameter if present
+                if (filename && filename.includes('.')) return decodeURIComponent(filename);
                 const urlObj = new URL(url);
                 const nameParam = urlObj.searchParams.get('name') || urlObj.searchParams.get('file');
-                if (nameParam) return nameParam;
-                
-                // Last fallback: generic name
+                if (nameParam) return decodeURIComponent(nameParam);
                 return 'downloaded-file';
             } catch (e) {
                 return 'downloaded-file';
@@ -491,11 +513,11 @@
                 parseResponse: (text) => {
                     try {
                         const data = JSON.parse(text);
-                        // tmpfiles returns: { "status": "success", "data": { "url": "https://tmpfiles.org/dl/xxxx/filename.jpg" } }
-                        return data.data?.url?.replace('/dl/', '/d/'); // /d/ is direct download
+                        // Return DIRECT DOWNLOAD URL (/dl/) not preview page (/d/)
+                        return data.data?.url?.replace('/dl/', '/dl/'); // Keep as /dl/ for direct
                     } catch { return null; }
                 },
-                maxSize: 100 * 1024 * 1024, // 100MB
+                maxSize: 100 * 1024 * 1024,
                 expiry: '60 minutes'
             },
             storage: {
@@ -506,23 +528,21 @@
                         return data.url || data.download_url || null;
                     } catch { return null; }
                 },
-                maxSize: 25 * 1024 * 1024 * 1024, // 25GB
+                maxSize: 25 * 1024 * 1024 * 1024,
                 expiry: '3 days'
             },
             custom: {
-                url: '', // set via config
+                url: '',
                 parseResponse: (text) => {
-                    // Try to extract URL from common response formats
                     try {
                         const data = JSON.parse(text);
                         return data.url || data.download_url || data.file_url || data.link || null;
                     } catch {
-                        // Fallback: if response is plain URL
                         if (text.trim().startsWith('http')) return text.trim();
                         return null;
                     }
                 },
-                maxSize: null, // user-defined
+                maxSize: null,
                 expiry: 'configurable'
             }
         };
@@ -530,15 +550,7 @@
         // ===== GLOBAL STATE =====
         let selectedFile = null;
         let uploadHistory = JSON.parse(localStorage.getItem('possibilitydata_history') || '[]');
-        let currentBackend = 'tmpfiles'; // default
-
-        // ===== INIT FOR MAIN APP =====
-        function initMainApp() {
-            loadConfig();
-            renderHistory();
-            setupDragDrop();
-            updateBackend();
-        }
+        let currentBackend = 'tmpfiles';
 
         function loadConfig() {
             const saved = localStorage.getItem('possibilitydata_config');
@@ -559,22 +571,16 @@
         function saveConfig() {
             const backend = document.getElementById('backendSelect').value;
             const customUrl = document.getElementById('customApiUrl').value.trim();
-            
             if (backend === 'custom' && !customUrl) {
                 showToast('⚠️ Please enter a custom API URL', 'error');
                 return;
             }
-            
             currentBackend = backend;
-            if (backend === 'custom') {
-                BACKENDS.custom.url = customUrl;
-            }
-            
+            if (backend === 'custom') BACKENDS.custom.url = customUrl;
             localStorage.setItem('possibilitydata_config', JSON.stringify({
                 backend,
                 customUrl: backend === 'custom' ? customUrl : ''
             }));
-            
             updateBackend();
             showToast('✅ Configuration saved!', 'success');
         }
@@ -583,8 +589,6 @@
             const backend = BACKENDS[currentBackend];
             document.getElementById('statusText').textContent = 
                 `${backend.maxSize ? formatFileSize(backend.maxSize) + ' max' : 'Custom'} • ${backend.expiry} expiry`;
-            
-            // Update drop zone hint
             const dropZone = document.getElementById('dropZone');
             if (dropZone) {
                 dropZone.querySelector('p').textContent = 
@@ -592,22 +596,17 @@
             }
         }
 
-        // ===== TAB SWITCHING =====
         function switchTab(tab) {
-            // Don't allow tab switching in receiver mode
             if (document.body.classList.contains('receiver-mode')) return;
-            
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.getElementById(`tab-${tab}`).classList.add('active');
             event.currentTarget.classList.add('active');
         }
 
-        // ===== DRAG & DROP =====
         function setupDragDrop() {
             const dropZone = document.getElementById('dropZone');
             if (!dropZone) return;
-            
             ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evt => {
                 dropZone.addEventListener(evt, e => { e.preventDefault(); e.stopPropagation(); });
             });
@@ -623,14 +622,12 @@
             });
         }
 
-        // ===== FILE HANDLING =====
         function handleFile(file) {
             const backend = BACKENDS[currentBackend];
             if (backend.maxSize && file.size > backend.maxSize) {
                 showToast(`⚠️ File too large for ${currentBackend} (max ${formatFileSize(backend.maxSize)})`, 'error');
                 return;
             }
-            
             selectedFile = file;
             document.getElementById('fileName').textContent = file.name;
             document.getElementById('fileSize').textContent = formatFileSize(file.size);
@@ -653,7 +650,6 @@
             document.getElementById('progressContainer').classList.remove('show');
         }
 
-        // ===== UPLOAD =====
         async function uploadFile() {
             if (!selectedFile) return;
             const backend = BACKENDS[currentBackend];
@@ -688,22 +684,25 @@
 
                 xhr.addEventListener('load', () => {
                     if (xhr.status >= 200 && xhr.status < 300) {
-                        const downloadUrl = backend.parseResponse(xhr.responseText);
-                        if (!downloadUrl) {
-                            throw new Error('Could not parse download URL from response');
+                        let downloadUrl = backend.parseResponse(xhr.responseText);
+                        if (!downloadUrl) throw new Error('Could not parse download URL from response');
+                        
+                        // Ensure we store the DIRECT download URL format
+                        if (currentBackend === 'tmpfiles' && downloadUrl.includes('/d/')) {
+                            downloadUrl = downloadUrl.replace('/d/', '/dl/');
                         }
+                        
                         const uniqueId = generateUniqueId();
                         document.getElementById('downloadLink').textContent = downloadUrl;
                         document.getElementById('uniqueId').textContent = uniqueId;
                         document.getElementById('resultBox').classList.add('show');
 
-                        // Create receiver-friendly link with encoded URL in hash
                         const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(downloadUrl)}`;
                         
                         const historyItem = {
                             id: uniqueId, name: selectedFile.name,
                             size: formatFileSize(selectedFile.size), url: downloadUrl,
-                            receiverUrl: receiverLink, // Store the receiver-friendly link
+                            receiverUrl: receiverLink,
                             type: selectedFile.name.split('.').pop().toUpperCase(),
                             date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
                             backend: currentBackend
@@ -719,10 +718,7 @@
                     btn.innerHTML = '🚀 Upload & Generate Link';
                 });
 
-                xhr.addEventListener('error', () => {
-                    throw new Error('Network error');
-                });
-
+                xhr.addEventListener('error', () => { throw new Error('Network error'); });
                 xhr.open('POST', backend.url);
                 xhr.send(formData);
 
@@ -733,13 +729,11 @@
             }
         }
 
-        // ===== DOWNLOAD FUNCTIONS =====
         function fetchById() {
             const code = document.getElementById('codeInput').value.trim();
             if (!code) { showToast('⚠️ Please enter a valid ID', 'error'); return; }
             const found = uploadHistory.find(h => h.id.toUpperCase() === code.toUpperCase());
             if (found) { 
-                // Use receiver-friendly URL if available
                 const urlToOpen = found.receiverUrl || found.url;
                 window.open(urlToOpen, '_blank'); 
                 showToast('📥 Opening download...', 'success'); 
@@ -751,23 +745,17 @@
         function fetchByUrl() {
             const url = document.getElementById('urlInput').value.trim();
             if (!url || !url.startsWith('http')) { showToast('⚠️ Please paste a valid download URL', 'error'); return; }
-            
-            // Convert to receiver-friendly format if it's a raw backend URL
             let finalUrl = url;
             if (!url.includes('#receiver') && !url.includes('#download')) {
                 finalUrl = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(url)}`;
             }
-            
             window.open(finalUrl, '_blank');
             showToast('📥 Opening download...', 'success');
         }
 
-        // ===== COPY & SHARE =====
         function copyLink() {
-            // Copy the receiver-friendly link instead of raw URL
             const rawLink = document.getElementById('downloadLink').textContent;
             const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
-            
             navigator.clipboard.writeText(receiverLink).then(() => showToast('📋 Receiver link copied!', 'success'))
                 .catch(() => {
                     const ta = document.createElement('textarea'); ta.value = receiverLink;
@@ -779,7 +767,6 @@
         async function shareLink() {
             const rawLink = document.getElementById('downloadLink').textContent;
             const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
-            
             if (navigator.share) {
                 try {
                     await navigator.share({ title: 'PossibilityData', text: 'Download your file', url: receiverLink });
@@ -787,12 +774,9 @@
             } else { copyLink(); }
         }
 
-        // ===== QR CODE =====
         function showQR() {
             const rawLink = document.getElementById('downloadLink').textContent;
-            // Create receiver-friendly link for QR code
             const receiverLink = `${window.location.origin}${window.location.pathname}#receiver?url=${encodeURIComponent(rawLink)}`;
-            
             const canvas = document.getElementById('qrCanvas');
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(receiverLink)}&bgcolor=1a2e1a&color=ffffff&margin=10`;
             const img = new Image();
@@ -803,12 +787,10 @@
         }
         function closeQR() { document.getElementById('qrModal').classList.remove('show'); }
 
-        // ===== HISTORY =====
         function renderHistory() {
             const list = document.getElementById('historyList');
             const clearBtn = document.getElementById('clearHistoryBtn');
             if (!list) return;
-            
             if (uploadHistory.length === 0) {
                 list.innerHTML = '<div class="empty-history">No files uploaded yet.</div>';
                 clearBtn.style.display = 'none'; return;
@@ -826,7 +808,6 @@
                 </div>`).join('');
         }
         function copyHistoryLink(index) {
-            // Copy receiver-friendly link
             const item = uploadHistory[index];
             const linkToCopy = item.receiverUrl || item.url;
             navigator.clipboard.writeText(linkToCopy).then(() => showToast('📋 Link copied!', 'success'));
@@ -843,7 +824,6 @@
             }
         }
 
-        // ===== UTILITIES =====
         function generateUniqueId() {
             const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
             let result = 'PD-';
