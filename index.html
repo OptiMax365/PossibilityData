@@ -1,1524 +1,1820 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>📁 POSSIBILITYDATA — P2P File Share</title>
-    <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
-    <style>
-        /* ===== GREEN THEME ===== */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-primary: #0a0f0a; --bg-secondary: #0f1a0f; --bg-card: #1a2e1a;
-            --bg-input: #142a14; --accent: #1a5f1a; --accent-light: #2d862d;
-            --highlight: #00c853; --text-primary: #ffffff; --text-secondary: #a8d8a8;
-            --success: #00e676; --warning: #ffb74d; --border: #2a4a2a;
-            --glow: rgba(0, 200, 83, 0.35); --glow-green: rgba(0, 230, 118, 0.4);
-            --radius: 16px;
-        }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>📁 POSSIBILITYDATA — P2P File Share</title>
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
+<style>
+/* ===== GREEN THEME ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+--bg-primary: #0a0f0a; --bg-secondary: #0f1a0f; --bg-card: #1a2e1a;
+--bg-input: #142a14; --accent: #1a5f1a; --accent-light: #2d862d;
+--highlight: #00c853; --text-primary: #ffffff; --text-secondary: #a8d8a8;
+--success: #00e676; --warning: #ffb74d; --border: #2a4a2a;
+--glow: rgba(0, 200, 83, 0.35); --glow-green: rgba(0, 230, 118, 0.4);
+--radius: 16px;
+}
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-primary); color: var(--text-primary);
-            min-height: 100vh; overflow-x: hidden;
-        }
-        
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle at 30% 40%, rgba(0, 200, 83, 0.06) 0%, transparent 50%),
-                        radial-gradient(circle at 70% 60%, rgba(0, 230, 118, 0.04) 0%, transparent 50%);
-            animation: bgFloat 20s ease-in-out infinite;
-            z-index: -1;
-            pointer-events: none;
-        }
 
-        @keyframes bgFloat {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(-2%, -2%) rotate(1deg); }
-        }
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: var(--bg-primary); color: var(--text-primary);
+        min-height: 100vh; overflow-x: hidden;
+    }
+    
+    body::before {
+        content: '';
+        position: fixed;
+        top: -50%; left: -50%;
+        width: 200%; height: 200%;
+        background: radial-gradient(circle at 30% 40%, rgba(0, 200, 83, 0.06) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 60%, rgba(0, 230, 118, 0.04) 0%, transparent 50%);
+        animation: bgFloat 20s ease-in-out infinite;
+        z-index: -1;
+        pointer-events: none;
+    }
 
-        .container { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        header { text-align: center; padding: 40px 0 30px; }
-        .logo { font-size: 3rem; margin-bottom: 5px; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-        header h1 { 
-            font-size: 2.2rem; font-weight: 800; 
-            background: linear-gradient(135deg, var(--highlight), var(--accent-light), #66bb6a); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            background-clip: text; letter-spacing: -1px; 
-        }
-        header p { color: var(--text-secondary); margin-top: 8px; font-size: 1rem; }
-        .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
-        
-        /* ===== STATUS BAR ===== */
-        .status-bar {
-            display: flex; align-items: center; gap: 10px;
-            padding: 14px 18px; border-radius: 12px;
-            margin-bottom: 20px; font-size: 14px; font-weight: 500;
-            border: 1px solid var(--border);
-        }
-        .status-bar.disconnected {
-            background: rgba(255, 107, 107, 0.1);
-            border-color: rgba(255, 107, 107, 0.3);
-            color: #ff8a8a;
-        }
-        .status-bar.connecting {
-            background: rgba(0, 200, 83, 0.1);
-            border-color: rgba(0, 200, 83, 0.3);
-            color: var(--highlight);
-        }
-        .status-bar.connected {
-            background: rgba(0, 230, 118, 0.1);
-            border-color: rgba(0, 230, 118, 0.3);
-            color: var(--success);
-        }
-        .status-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: currentColor;
-            flex-shrink: 0;
-        }
-        .status-bar.connecting .status-dot {
-            animation: pulse 1s infinite;
-        }
+    @keyframes bgFloat {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        50% { transform: translate(-2%, -2%) rotate(1deg); }
+    }
 
-        /* ===== CARDS ===== */
-        .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 20px;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        .card:hover {
-            box-shadow: 0 8px 30px rgba(0,0,0,0.3);
-        }
-        .card-title {
-            font-size: 18px; font-weight: 600; margin-bottom: 16px;
-            display: flex; align-items: center; gap: 10px;
-        }
-        .card-title .icon { font-size: 22px; }
+    .container { position: relative; z-index: 1; max-width: 700px; margin: 0 auto; padding: 20px; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header { text-align: center; padding: 40px 0 30px; }
+    .logo { font-size: 3rem; margin-bottom: 5px; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+    header h1 { 
+        font-size: 2.2rem; font-weight: 800; 
+        background: linear-gradient(135deg, var(--highlight), var(--accent-light), #66bb6a); 
+        -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        background-clip: text; letter-spacing: -1px; 
+    }
+    header p { color: var(--text-secondary); margin-top: 8px; font-size: 1rem; }
+    .subtitle { color: var(--text-secondary); font-size: 0.9rem; margin-top: 4px; }
+    
+    /* ===== STATUS BAR ===== */
+    .status-bar {
+        display: flex; align-items: center; gap: 10px;
+        padding: 14px 18px; border-radius: 12px;
+        margin-bottom: 20px; font-size: 14px; font-weight: 500;
+        border: 1px solid var(--border);
+    }
+    .status-bar.disconnected {
+        background: rgba(255, 107, 107, 0.1);
+        border-color: rgba(255, 107, 107, 0.3);
+        color: #ff8a8a;
+    }
+    .status-bar.connecting {
+        background: rgba(0, 200, 83, 0.1);
+        border-color: rgba(0, 200, 83, 0.3);
+        color: var(--highlight);
+    }
+    .status-bar.connected {
+        background: rgba(0, 230, 118, 0.1);
+        border-color: rgba(0, 230, 118, 0.3);
+        color: var(--success);
+    }
+    .status-dot {
+        width: 10px; height: 10px; border-radius: 50%;
+        background: currentColor;
+        flex-shrink: 0;
+    }
+    .status-bar.connecting .status-dot {
+        animation: pulse 1s infinite;
+    }
 
-        /* ===== CONNECTION GRID ===== */
-        .connection-grid {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            gap: 16px; align-items: start;
-        }
-        @media (max-width: 500px) {
-            .connection-grid { grid-template-columns: 1fr; }
-            .connection-grid .divider { display: none; }
-        }
-        .divider {
-            color: var(--text-secondary);
-            font-size: 24px; font-weight: 300;
-            padding: 10px 0; text-align: center;
-        }
+    /* ===== CARDS ===== */
+    .card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 24px;
+        margin-bottom: 20px;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+    }
+    .card-title {
+        font-size: 18px; font-weight: 600; margin-bottom: 16px;
+        display: flex; align-items: center; gap: 10px;
+    }
+    .card-title .icon { font-size: 22px; }
 
-        /* ===== BUTTONS ===== */
-        .btn {
-            padding: 14px 28px; border: none; border-radius: 12px;
-            font-size: 15px; font-weight: 600; cursor: pointer;
-            transition: all 0.2s; display: inline-flex;
-            align-items: center; justify-content: center; gap: 8px;
-            width: 100%;
-        }
-        .btn:active { transform: scale(0.97); }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, var(--highlight), var(--accent-light));
-            color: white;
-        }
-        .btn-primary:hover:not(:disabled) {
-            box-shadow: 0 4px 20px var(--glow);
-            transform: translateY(-1px);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #00b368);
-            color: #000;
-        }
-        .btn-success:hover:not(:disabled) {
-            box-shadow: 0 4px 20px var(--glow-green);
-            transform: translateY(-1px);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #ff6b6b, #e05555);
-            color: white;
-        }
-        .btn-danger:hover:not(:disabled) {
-            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
-        }
-        
-        .btn-outline {
-            background: transparent;
-            border: 2px solid var(--highlight);
-            color: var(--highlight);
-        }
-        .btn-outline:hover:not(:disabled) {
-            background: rgba(0, 200, 83, 0.1);
-        }
-        
-        .btn:disabled {
-            opacity: 0.5; cursor: not-allowed;
-            transform: none !important; box-shadow: none !important;
-        }
+    /* ===== CONNECTION GRID ===== */
+    .connection-grid {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 16px; align-items: start;
+    }
+    @media (max-width: 500px) {
+        .connection-grid { grid-template-columns: 1fr; }
+        .connection-grid .divider { display: none; }
+    }
+    .divider {
+        color: var(--text-secondary);
+        font-size: 24px; font-weight: 300;
+        padding: 10px 0; text-align: center;
+    }
 
-        /* ===== INPUTS ===== */
-        .input-group { margin-bottom: 16px; }
-        .input-group label {
-            display: block; font-size: 13px; color: var(--text-secondary);
-            margin-bottom: 8px; font-weight: 500;
-        }
-        .input-field {
-            width: 100%; padding: 14px 16px;
-            background: var(--bg-input); border: 2px solid var(--border);
-            border-radius: 12px; color: var(--text-primary);
-            font-size: 16px; font-family: 'Courier New', monospace;
-            letter-spacing: 1px; transition: border-color 0.2s;
-        }
-        .input-field:focus {
-            outline: none; border-color: var(--highlight);
-        }
-        .input-field::placeholder {
-            font-family: 'Segoe UI', sans-serif;
-            color: var(--text-secondary);
-        }
-        .input-field.identifier {
-            text-align: center;
-            font-size: 18px;
-            letter-spacing: 2px;
-            text-transform: lowercase;
-        }
+    /* ===== BUTTONS ===== */
+    .btn {
+        padding: 14px 28px; border: none; border-radius: 12px;
+        font-size: 15px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s; display: inline-flex;
+        align-items: center; justify-content: center; gap: 8px;
+        width: 100%;
+    }
+    .btn:active { transform: scale(0.97); }
+    
+    .btn-primary {
+        background: linear-gradient(135deg, var(--highlight), var(--accent-light));
+        color: white;
+    }
+    .btn-primary:hover:not(:disabled) {
+        box-shadow: 0 4px 20px var(--glow);
+        transform: translateY(-1px);
+    }
+    
+    .btn-success {
+        background: linear-gradient(135deg, var(--success), #00b368);
+        color: #000;
+    }
+    .btn-success:hover:not(:disabled) {
+        box-shadow: 0 4px 20px var(--glow-green);
+        transform: translateY(-1px);
+    }
+    
+    .btn-danger {
+        background: linear-gradient(135deg, #ff6b6b, #e05555);
+        color: white;
+    }
+    .btn-danger:hover:not(:disabled) {
+        box-shadow: 0 4px 20px rgba(255, 107, 107, 0.4);
+    }
+    
+    .btn-outline {
+        background: transparent;
+        border: 2px solid var(--highlight);
+        color: var(--highlight);
+    }
+    .btn-outline:hover:not(:disabled) {
+        background: rgba(0, 200, 83, 0.1);
+    }
+    
+    .btn:disabled {
+        opacity: 0.5; cursor: not-allowed;
+        transform: none !important; box-shadow: none !important;
+    }
 
-        /* ===== ROOM CODE DISPLAY ===== */
-        .room-display {
-            display: flex; align-items: center; gap: 12px; margin-top: 12px;
-            flex-wrap: wrap;
-        }
-        .room-code {
-            flex: 1; min-width: 200px;
-            background: var(--bg-input);
-            border: 2px dashed var(--border); border-radius: 12px;
-            padding: 16px; text-align: center;
-            font-family: 'Courier New', monospace;
-            font-size: 22px; font-weight: 700;
-            letter-spacing: 3px; color: var(--highlight);
-            user-select: all; word-break: break-all;
-        }
-        .copy-btn, .qr-btn {
-            padding: 14px; background: var(--bg-input);
-            border: 1px solid var(--border); border-radius: 12px;
-            color: var(--text-primary); cursor: pointer;
-            font-size: 18px; transition: all 0.2s; flex-shrink: 0;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .copy-btn:hover, .qr-btn:hover {
-            background: var(--bg-secondary); border-color: var(--highlight);
-        }
-        .copy-btn.copied {
-            color: var(--success); border-color: var(--success);
-        }
+    /* ===== INPUTS ===== */
+    .input-group { margin-bottom: 16px; }
+    .input-group label {
+        display: block; font-size: 13px; color: var(--text-secondary);
+        margin-bottom: 8px; font-weight: 500;
+    }
+    .input-field {
+        width: 100%; padding: 14px 16px;
+        background: var(--bg-input); border: 2px solid var(--border);
+        border-radius: 12px; color: var(--text-primary);
+        font-size: 16px; font-family: 'Courier New', monospace;
+        letter-spacing: 1px; transition: border-color 0.2s;
+    }
+    .input-field:focus {
+        outline: none; border-color: var(--highlight);
+    }
+    .input-field::placeholder {
+        font-family: 'Segoe UI', sans-serif;
+        color: var(--text-secondary);
+    }
+    .input-field.identifier {
+        text-align: center;
+        font-size: 18px;
+        letter-spacing: 2px;
+        text-transform: lowercase;
+    }
 
-        /* ===== QR MODAL ===== */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0, 0, 0, 0.85); z-index: 2000;
-            display: none; align-items: center; justify-content: center;
-            backdrop-filter: blur(10px); padding: 20px;
-        }
-        .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        .modal {
-            background: var(--bg-card); border-radius: 20px;
-            padding: 24px; text-align: center;
-            max-width: 400px; width: 100%;
-            border: 1px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-        }
-        .modal h3 { margin-bottom: 16px; font-size: 1.3rem; }
-        .modal .qr-container {
-            background: white; padding: 16px; border-radius: 16px;
-            display: inline-block; margin: 16px 0;
-        }
-        .modal .qr-container canvas, .modal .qr-container img {
-            display: block; border-radius: 8px;
-        }
-        .modal-close {
-            padding: 12px 30px; border: none; border-radius: 10px;
-            background: var(--highlight); color: white;
-            font-weight: 600; cursor: pointer; font-size: 0.95rem;
-            transition: all 0.3s; margin-top: 8px;
-        }
-        .modal-close:hover { background: #00e060; }
+    /* ===== ROOM CODE DISPLAY ===== */
+    .room-display {
+        display: flex; align-items: center; gap: 12px; margin-top: 12px;
+        flex-wrap: wrap;
+    }
+    .room-code {
+        flex: 1; min-width: 200px;
+        background: var(--bg-input);
+        border: 2px dashed var(--border); border-radius: 12px;
+        padding: 16px; text-align: center;
+        font-family: 'Courier New', monospace;
+        font-size: 22px; font-weight: 700;
+        letter-spacing: 3px; color: var(--highlight);
+        user-select: all; word-break: break-all;
+    }
+    .copy-btn, .qr-btn {
+        padding: 14px; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 12px;
+        color: var(--text-primary); cursor: pointer;
+        font-size: 18px; transition: all 0.2s; flex-shrink: 0;
+        display: inline-flex; align-items: center; justify-content: center;
+    }
+    .copy-btn:hover, .qr-btn:hover {
+        background: var(--bg-secondary); border-color: var(--highlight);
+    }
+    .copy-btn.copied {
+        color: var(--success); border-color: var(--success);
+    }
 
-        /* ===== QR SCANNER ===== */
-        .scanner-container {
-            background: var(--bg-input); border-radius: 16px;
-            padding: 16px; margin: 16px 0;
-        }
-        #qr-reader { width: 100%; border-radius: 12px; overflow: hidden; }
-        #qr-reader video { width: 100%; border-radius: 12px; }
+    /* ===== QR MODAL ===== */
+    .modal-overlay {
+        position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.85); z-index: 2000;
+        display: none; align-items: center; justify-content: center;
+        backdrop-filter: blur(10px); padding: 20px;
+    }
+    .modal-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+    .modal {
+        background: var(--bg-card); border-radius: 20px;
+        padding: 24px; text-align: center;
+        max-width: 400px; width: 100%;
+        border: 1px solid var(--border);
+        box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    }
+    .modal h3 { margin-bottom: 16px; font-size: 1.3rem; }
+    .modal .qr-container {
+        background: white; padding: 16px; border-radius: 16px;
+        display: inline-block; margin: 16px 0;
+    }
+    .modal .qr-container canvas, .modal .qr-container img {
+        display: block; border-radius: 8px;
+    }
+    .modal-close {
+        padding: 12px 30px; border: none; border-radius: 10px;
+        background: var(--highlight); color: white;
+        font-weight: 600; cursor: pointer; font-size: 0.95rem;
+        transition: all 0.3s; margin-top: 8px;
+    }
+    .modal-close:hover { background: #00e060; }
 
-        /* ===== DROP ZONE ===== */
-        .drop-zone {
-            border: 2px dashed var(--border); border-radius: var(--radius);
-            padding: 50px 20px; text-align: center; cursor: pointer;
-            transition: all 0.3s; position: relative; overflow: hidden;
-            background: var(--bg-input);
-        }
-        .drop-zone:hover, .drop-zone.dragover {
-            border-color: var(--highlight);
-            background: rgba(0, 200, 83, 0.05);
-        }
-        .drop-zone.dragover { transform: scale(1.01); }
-        .drop-zone .drop-icon { font-size: 52px; margin-bottom: 12px; }
-        .drop-zone .drop-text { font-size: 16px; color: var(--text-primary); margin-bottom: 6px; }
-        .drop-zone .drop-subtext { font-size: 13px; color: var(--text-secondary); }
-        .drop-zone input[type="file"] {
-            position: absolute; inset: 0; opacity: 0; cursor: pointer;
-        }
-        .drop-zone.disabled { opacity: 0.4; pointer-events: none; }
+    /* ===== QR SCANNER ===== */
+    .scanner-container {
+        background: var(--bg-input); border-radius: 16px;
+        padding: 16px; margin: 16px 0;
+    }
+    #qr-reader { width: 100%; border-radius: 12px; overflow: hidden; }
+    #qr-reader video { width: 100%; border-radius: 12px; }
 
-        /* ===== FILE LIST ===== */
-        .file-list { margin-top: 20px; }
-        .file-item {
-            display: flex; align-items: center; gap: 14px;
-            padding: 14px; background: var(--bg-input);
-            border: 1px solid var(--border); border-radius: 12px;
-            margin-bottom: 10px; animation: slideIn 0.3s ease;
-        }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .file-icon { font-size: 32px; flex-shrink: 0; }
-        .file-info { flex: 1; min-width: 0; }
-        .file-name {
-            font-weight: 600; font-size: 14px;
-            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-        }
-        .file-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
-        .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
-        .file-btn {
-            padding: 8px 16px; border: none; border-radius: 8px;
-            font-size: 13px; font-weight: 600; cursor: pointer;
-            transition: all 0.2s;
-        }
-        .file-btn.download { background: var(--highlight); color: white; }
-        .file-btn.download:hover { background: var(--accent-light); }
-        .file-btn.remove {
-            background: rgba(255, 107, 107, 0.15); color: #ff8a8a;
-        }
-        .file-btn.remove:hover { background: rgba(255, 107, 107, 0.25); }
+    /* ===== DROP ZONE ===== */
+    .drop-zone {
+        border: 2px dashed var(--border); border-radius: var(--radius);
+        padding: 50px 20px; text-align: center; cursor: pointer;
+        transition: all 0.3s; position: relative; overflow: hidden;
+        background: var(--bg-input);
+    }
+    .drop-zone:hover, .drop-zone.dragover {
+        border-color: var(--highlight);
+        background: rgba(0, 200, 83, 0.05);
+    }
+    .drop-zone.dragover { transform: scale(1.01); }
+    .drop-zone .drop-icon { font-size: 52px; margin-bottom: 12px; }
+    .drop-zone .drop-text { font-size: 16px; color: var(--text-primary); margin-bottom: 6px; }
+    .drop-zone .drop-subtext { font-size: 13px; color: var(--text-secondary); }
+    .drop-zone input[type="file"] {
+        position: absolute; inset: 0; opacity: 0; cursor: pointer;
+    }
+    .drop-zone.disabled { opacity: 0.4; pointer-events: none; }
 
-        /* ===== PROGRESS BAR ===== */
-        .progress-bar {
-            height: 4px; background: var(--border);
-            border-radius: 2px; margin-top: 8px; overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success));
-            border-radius: 2px; transition: width 0.3s; width: 0%;
-        }
-        .progress-fill.complete { background: var(--success); }
+    /* ===== FILE LIST ===== */
+    .file-list { margin-top: 20px; }
+    .file-item {
+        display: flex; align-items: center; gap: 14px;
+        padding: 14px; background: var(--bg-input);
+        border: 1px solid var(--border); border-radius: 12px;
+        margin-bottom: 10px; animation: slideIn 0.3s ease;
+    }
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .file-icon { font-size: 32px; flex-shrink: 0; }
+    .file-info { flex: 1; min-width: 0; }
+    .file-name {
+        font-weight: 600; font-size: 14px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .file-meta { font-size: 12px; color: var(--text-secondary); margin-top: 3px; }
+    .file-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .file-btn {
+        padding: 8px 16px; border: none; border-radius: 8px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s;
+    }
+    .file-btn.download { background: var(--highlight); color: white; }
+    .file-btn.download:hover { background: var(--accent-light); }
+    .file-btn.remove {
+        background: rgba(255, 107, 107, 0.15); color: #ff8a8a;
+    }
+    .file-btn.remove:hover { background: rgba(255, 107, 107, 0.25); }
 
-        /* ===== PEER LIST ===== */
-        .peer-list { margin-top: 16px; }
-        .peer-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 10px 14px; background: var(--bg-input);
-            border-radius: 10px; margin-bottom: 8px; font-size: 14px;
-        }
-        .peer-avatar {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: linear-gradient(135deg, var(--highlight), var(--success));
-            display: flex; align-items: center; justify-content: center;
-            font-size: 14px; flex-shrink: 0; color: white;
-        }
-        .peer-name { flex: 1; font-weight: 500; }
-        .peer-status { font-size: 12px; color: var(--success); }
-        .peer-you { color: var(--highlight); font-weight: 600; }
+    /* ===== PROGRESS BAR ===== */
+    .progress-bar {
+        height: 4px; background: var(--border);
+        border-radius: 2px; margin-top: 8px; overflow: hidden;
+    }
+    .progress-fill {
+        height: 100%; background: linear-gradient(90deg, var(--highlight), var(--success));
+        border-radius: 2px; transition: width 0.3s; width: 0%;
+    }
+    .progress-fill.complete { background: var(--success); }
 
-        /* ===== TOAST ===== */
-        .toast-container {
-            position: fixed; bottom: 24px; right: 24px; z-index: 1000;
-            display: flex; flex-direction: column; gap: 10px;
-        }
-        @media (max-width: 600px) {
-            .toast-container { left: 12px; right: 12px; bottom: 12px; }
-        }
-        .toast {
-            padding: 14px 22px; background: var(--bg-card);
-            border: 1px solid var(--border); border-radius: 12px;
-            font-size: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            animation: toastIn 0.3s ease, toastOut 0.3s ease 3s forwards;
-            display: flex; align-items: center; gap: 10px;
-        }
-        @keyframes toastIn {
-            from { opacity: 0; transform: translateX(40px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-        @keyframes toastOut {
-            from { opacity: 1; transform: translateX(0); }
-            to { opacity: 0; transform: translateX(40px); }
-        }
-        .toast.success { border-left: 4px solid var(--success); }
-        .toast.error { border-left: 4px solid #ff6b6b; }
+    /* ===== PEER LIST ===== */
+    .peer-list { margin-top: 16px; }
+    .peer-item {
+        display: flex; align-items: center; gap: 10px;
+        padding: 10px 14px; background: var(--bg-input);
+        border-radius: 10px; margin-bottom: 8px; font-size: 14px;
+    }
+    .peer-avatar {
+        width: 32px; height: 32px; border-radius: 50%;
+        background: linear-gradient(135deg, var(--highlight), var(--success));
+        display: flex; align-items: center; justify-content: center;
+        font-size: 14px; flex-shrink: 0; color: white;
+    }
+    .peer-name { flex: 1; font-weight: 500; }
+    .peer-status { font-size: 12px; color: var(--success); }
+    .peer-you { color: var(--highlight); font-weight: 600; }
 
-        /* ===== SECTIONS ===== */
-        .section { display: none; animation: fadeIn 0.4s ease; }
-        .section.active { display: block; }
+    /* ===== TOAST ===== */
+    .toast-container {
+        position: fixed; bottom: 24px; right: 24px; z-index: 1000;
+        display: flex; flex-direction: column; gap: 10px;
+    }
+    @media (max-width: 600px) {
+        .toast-container { left: 12px; right: 12px; bottom: 12px; }
+    }
+    .toast {
+        padding: 14px 22px; background: var(--bg-card);
+        border: 1px solid var(--border); border-radius: 12px;
+        font-size: 14px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        animation: toastIn 0.3s ease, toastOut 0.3s ease 3s forwards;
+        display: flex; align-items: center; gap: 10px;
+    }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(40px); }
+        to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toastOut {
+        from { opacity: 1; transform: translateX(0); }
+        to { opacity: 0; transform: translateX(40px); }
+    }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid #ff6b6b; }
 
-        /* ===== HOW IT WORKS ===== */
-        .how-it-works {
-            display: grid; grid-template-columns: repeat(3, 1fr);
-            gap: 12px; margin-top: 16px;
-        }
-        @media (max-width: 400px) {
-            .how-it-works { grid-template-columns: 1fr; }
-        }
-        .step {
-            text-align: center; padding: 16px 10px;
-            background: var(--bg-input); border-radius: 12px;
-        }
-        .step-num {
-            width: 28px; height: 28px; border-radius: 50%;
-            background: var(--highlight); color: white;
-            display: inline-flex; align-items: center; justify-content: center;
-            font-size: 13px; font-weight: 700; margin-bottom: 8px;
-        }
-        .step p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
+    /* ===== SECTIONS ===== */
+    .section { display: none; animation: fadeIn 0.4s ease; }
+    .section.active { display: block; }
 
-        /* ===== BADGE ===== */
-        .badge {
-            display: inline-block; padding: 4px 10px;
-            border-radius: 20px; font-size: 11px; font-weight: 700;
-            background: rgba(0, 200, 83, 0.15); color: var(--highlight);
-        }
+    /* ===== HOW IT WORKS ===== */
+    .how-it-works {
+        display: grid; grid-template-columns: repeat(3, 1fr);
+        gap: 12px; margin-top: 16px;
+    }
+    @media (max-width: 400px) {
+        .how-it-works { grid-template-columns: 1fr; }
+    }
+    .step {
+        text-align: center; padding: 16px 10px;
+        background: var(--bg-input); border-radius: 12px;
+    }
+    .step-num {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: var(--highlight); color: white;
+        display: inline-flex; align-items: center; justify-content: center;
+        font-size: 13px; font-weight: 700; margin-bottom: 8px;
+    }
+    .step p { font-size: 12px; color: var(--text-secondary); line-height: 1.4; }
 
-        /* ===== SPINNER ===== */
-        .spinner {
-            width: 20px; height: 20px;
-            border: 2px solid rgba(255,255,255,0.2);
-            border-top-color: white; border-radius: 50%;
-            animation: spin 0.8s linear infinite; display: inline-block;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
+    /* ===== BADGE ===== */
+    .badge {
+        display: inline-block; padding: 4px 10px;
+        border-radius: 20px; font-size: 11px; font-weight: 700;
+        background: rgba(0, 200, 83, 0.15); color: var(--highlight);
+    }
 
-        /* ===== EMPTY STATE ===== */
-        .empty-state {
-            text-align: center; padding: 20px;
-            color: var(--text-secondary); font-size: 14px;
-        }
+    /* ===== SPINNER ===== */
+    .spinner {
+        width: 20px; height: 20px;
+        border: 2px solid rgba(255,255,255,0.2);
+        border-top-color: white; border-radius: 50%;
+        animation: spin 0.8s linear infinite; display: inline-block;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* ===== FOOTER ===== */
-        footer {
-            text-align: center; padding: 30px 0; margin-top: auto;
-            color: var(--text-secondary); font-size: 0.8rem;
-        }
-        footer a { color: var(--highlight); text-decoration: none; }
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center; padding: 20px;
+        color: var(--text-secondary); font-size: 14px;
+    }
 
-        /* ===== RESPONSIVE ===== */
-        @media (max-width: 600px) {
-            .container { padding: 12px; }
-            header { padding: 24px 0 20px; }
-            .logo { font-size: 2.5rem; }
-            header h1 { font-size: 1.6rem; }
-            .card { padding: 20px; }
-            .room-code { font-size: 16px; padding: 12px; }
-            .drop-zone { padding: 30px 16px; }
-            .drop-zone .drop-icon { font-size: 40px; }
-            .connection-grid { gap: 12px; }
-            .btn { padding: 12px 20px; font-size: 14px; }
-            .how-it-works { gap: 8px; }
-            .step { padding: 12px 8px; }
-        }
+    /* ===== FOOTER ===== */
+    footer {
+        text-align: center; padding: 30px 0; margin-top: auto;
+        color: var(--text-secondary); font-size: 0.8rem;
+    }
+    footer a { color: var(--highlight); text-decoration: none; }
 
-        /* ===== ICON CLASSES ===== */
-        .icon-image { background: linear-gradient(135deg, #00c853, #69f0ae) !important; }
-        .icon-video { background: linear-gradient(135deg, #2d862d, #4caf50) !important; }
-        .icon-audio { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
-        .icon-pdf { background: linear-gradient(135deg, #e57373, #f44336) !important; }
-        .icon-zip { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
-        .icon-doc { background: linear-gradient(135deg, #64b5f6, #2196f3) !important; }
-        .icon-code { background: linear-gradient(135deg, #4caf50, #2e7d32) !important; }
-        .icon-other { background: linear-gradient(135deg, #90a4ae, #607d8b) !important; }
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+        .container { padding: 12px; }
+        header { padding: 24px 0 20px; }
+        .logo { font-size: 2.5rem; }
+        header h1 { font-size: 1.6rem; }
+        .card { padding: 20px; }
+        .room-code { font-size: 16px; padding: 12px; }
+        .drop-zone { padding: 30px 16px; }
+        .drop-zone .drop-icon { font-size: 40px; }
+        .connection-grid { gap: 12px; }
+        .btn { padding: 12px 20px; font-size: 14px; }
+        .how-it-works { gap: 8px; }
+        .step { padding: 12px 8px; }
+    }
 
-        /* ===== IDENTIFIER SUGGESTIONS ===== */
-        .identifier-suggestions {
-            display: flex; gap: 8px; flex-wrap: wrap;
-            margin-top: 8px;
-        }
-        .suggestion-chip {
-            padding: 6px 12px; background: var(--bg-secondary);
-            border: 1px solid var(--border); border-radius: 20px;
-            font-size: 12px; color: var(--text-secondary);
-            cursor: pointer; transition: all 0.2s;
-        }
-        .suggestion-chip:hover {
-            border-color: var(--highlight); color: var(--highlight);
-        }
-    </style>
+    /* ===== ICON CLASSES ===== */
+    .icon-image { background: linear-gradient(135deg, #00c853, #69f0ae) !important; }
+    .icon-video { background: linear-gradient(135deg, #2d862d, #4caf50) !important; }
+    .icon-audio { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
+    .icon-pdf { background: linear-gradient(135deg, #e57373, #f44336) !important; }
+    .icon-zip { background: linear-gradient(135deg, #ffb74d, #ff9800) !important; }
+    .icon-doc { background: linear-gradient(135deg, #64b5f6, #2196f3) !important; }
+    .icon-code { background: linear-gradient(135deg, #4caf50, #2e7d32) !important; }
+    .icon-other { background: linear-gradient(135deg, #90a4ae, #607d8b) !important; }
+
+    /* ===== IDENTIFIER SUGGESTIONS ===== */
+    .identifier-suggestions {
+        display: flex; gap: 8px; flex-wrap: wrap;
+        margin-top: 8px;
+    }
+    .suggestion-chip {
+        padding: 6px 12px; background: var(--bg-secondary);
+        border: 1px solid var(--border); border-radius: 20px;
+        font-size: 12px; color: var(--text-secondary);
+        cursor: pointer; transition: all 0.2s;
+    }
+    .suggestion-chip:hover {
+        border-color: var(--highlight); color: var(--highlight);
+    }
+
+    /* ===== PASTE FIELD ===== */
+    .paste-field {
+        border: 2px dashed var(--border); border-radius: var(--radius);
+        padding: 16px; min-height: 120px; cursor: text;
+        transition: all 0.3s; position: relative; background: var(--bg-input);
+        outline: none; font-size: 15px; line-height: 1.5; color: var(--text-primary);
+    }
+    .paste-field:focus, .paste-field.active {
+        border-color: var(--highlight);
+        background: rgba(0, 200, 83, 0.05);
+        box-shadow: 0 0 0 3px var(--glow);
+    }
+    .paste-field::placeholder {
+        color: var(--text-secondary); font-style: italic;
+    }
+    .paste-field img {
+        max-width: 100%; height: auto; border-radius: 8px; margin: 4px 0;
+    }
+    .paste-field video {
+        max-width: 100%; border-radius: 8px; margin: 4px 0;
+    }
+    .paste-actions {
+        display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;
+    }
+    .paste-btn {
+        padding: 10px 18px; border: none; border-radius: 10px;
+        font-size: 13px; font-weight: 600; cursor: pointer;
+        transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .paste-btn.send { background: var(--highlight); color: white; }
+    .paste-btn.send:hover { background: var(--accent-light); }
+    .paste-btn.copy { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+    .paste-btn.copy:hover { border-color: var(--highlight); }
+    .paste-btn.edit { background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border); }
+    .paste-btn.edit:hover { border-color: var(--highlight); }
+    .paste-received {
+        margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+    }
+    .paste-item {
+        background: var(--bg-input); border: 1px solid var(--border);
+        border-radius: 12px; padding: 14px; margin-bottom: 10px;
+    }
+    .paste-header {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 10px; font-size: 12px; color: var(--text-secondary);
+    }
+    .paste-sender { font-weight: 600; color: var(--highlight); }
+    .paste-content {
+        font-size: 14px; line-height: 1.5; white-space: pre-wrap; word-break: break-word;
+    }
+    .paste-content[contenteditable="true"] {
+        outline: none; padding: 8px; border-radius: 6px;
+        background: rgba(0, 200, 83, 0.05);
+    }
+    .paste-content[contenteditable="true"]:focus {
+        background: rgba(0, 200, 83, 0.1);
+    }
+    .paste-empty {
+        text-align: center; padding: 20px; color: var(--text-secondary);
+        font-size: 13px; font-style: italic;
+    }
+
+    /* ===== INLINE QR DISPLAY ===== */
+    .inline-qr-container {
+        margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--border);
+        text-align: center;
+    }
+    .inline-qr-container .qr-wrapper {
+        background: white; padding: 12px; border-radius: 12px;
+        display: inline-block; margin: 8px 0;
+    }
+    .inline-qr-container .qr-wrapper canvas, 
+    .inline-qr-container .qr-wrapper img {
+        display: block; border-radius: 6px;
+    }
+    .inline-qr-label {
+        font-size: 13px; color: var(--text-secondary); margin-bottom: 8px;
+    }
+</style>
+
 </head>
 <body>
-    <div class="container">
-        <header>
-            <span class="logo">📁</span>
-            <h1>PossibilityData</h1>
-            <p class="subtitle">P2P file transfer with QR join & custom identifiers</p>
-        </header>
-
-        <!-- SETUP SCREEN -->
-        <div id="setupScreen" class="section active">
-            <div class="card">
-                <div class="card-title">
-                    <span class="icon">🚀</span> Create or Join Room
-                </div>
-                
-                <!-- Identifier Input -->
-                <div class="input-group">
-                    <label>Your Identifier (username)</label>
-                    <input type="text" class="input-field identifier" id="myIdentifier" 
-                           placeholder="e.g. Ultrasend" maxlength="30"
-                           pattern="[a-z0-9\-_]+" title="Use lowercase letters, numbers, hyphens, or underscores">
-                    <div class="identifier-suggestions">
-                        <span class="suggestion-chip" onclick="setIdentifier('my-device')">my-device</span>
-                        <span class="suggestion-chip" onclick="setIdentifier('office-pc')">office-pc</span>
-                        <span class="suggestion-chip" onclick="setIdentifier('phone-main')">phone-main</span>
-                        <span class="suggestion-chip" onclick="generateRandomIdentifier()">🎲 Random</span>
-                    </div>
-                </div>
-
-                <div class="connection-grid">
-                    <div>
-                        <button class="btn btn-primary" id="createRoomBtn" onclick="createRoom()">
-                            ✨ Create Room
-                        </button>
-                        <p style="font-size:12px; color:var(--text-secondary); margin-top:8px; text-align:center;">
-                            Others join using your identifier
-                        </p>
-                        <button class="btn btn-outline" id="showQrBtn" onclick="showRoomQR()" style="margin-top:10px; display:none;">
-                            📱 Show QR Code
-                        </button>
-                    </div>
-                    <div class="divider">or</div>
-                    <div>
-                        <div class="input-group">
-                            <label>Join Room Identifier</label>
-                            <input type="text" class="input-field identifier" id="joinIdentifier" 
-                                   placeholder="e.g. ultrasend" maxlength="30">
-                        </div>
-                        <button class="btn btn-success" id="joinRoomBtn" onclick="joinRoom()">
-                            🔗 Join Room
-                        </button>
-                        <button class="btn btn-outline" onclick="startQRScanner()" style="margin-top:10px;">
-                            📷 Scan QR to Join
-                        </button>
-                    </div>
-                </div>
-
-                <div class="how-it-works">
-                    <div class="step">
-                        <div class="step-num">1</div>
-                        <p>Set your identifier & create room</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">2</div>
-                        <p>Share QR code or identifier</p>
-                    </div>
-                    <div class="step">
-                        <div class="step-num">3</div>
-                        <p>Send files directly, no server</p>
-                    </div>
-                </div>
+<div class="container">
+<header>
+<span class="logo">📁</span>
+<h1>PossibilityData</h1>
+<p class="subtitle">P2P file transfer with QR join & custom identifiers</p>
+</header>
+    <!-- SETUP SCREEN -->
+    <div id="setupScreen" class="section active">
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">🚀</span> Create or Join Room
             </div>
-        </div>
-
-        <!-- ROOM SCREEN -->
-        <div id="roomScreen" class="section">
-            <div id="statusBar" class="status-bar disconnected">
-                <div class="status-dot"></div>
-                <span id="statusText">Disconnected</span>
-            </div>
-
-            <!-- Room Info (Host) -->
-            <div id="hostSection" class="card" style="display:none;">
-                <div class="card-title">
-                    <span class="icon">🎫</span> Your Room
-                </div>
-                <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
-                    Share this identifier or QR code for others to join
-                </p>
-                <div class="room-display">
-                    <div class="room-code" id="roomCodeDisplay">------</div>
-                    <button class="copy-btn" id="copyBtn" onclick="copyRoomCode()" title="Copy">📋</button>
-                    <button class="qr-btn" onclick="showRoomQR()" title="Show QR">📱</button>
-                </div>
-            </div>
-
-            <!-- Connected Peers -->
-            <div class="card">
-                <div class="card-title">
-                    <span class="icon">👥</span> Connected Devices
-                    <span class="badge" id="peerCount">0</span>
-                </div>
-                <div class="peer-list" id="peerList">
-                    <div class="empty-state">No devices connected yet</div>
-                </div>
-            </div>
-
-            <!-- Send Files -->
-            <div class="card">
-                <div class="card-title">
-                    <span class="icon">📤</span> Send Files
-                </div>
-                <div class="drop-zone disabled" id="dropZone">
-                    <input type="file" id="fileInput" multiple>
-                    <div class="drop-icon">📁</div>
-                    <div class="drop-text">Drop files here or tap to browse</div>
-                    <div class="drop-subtext">Any file type • No size limit (P2P)</div>
-                </div>
-            </div>
-
-            <!-- Files List -->
-            <div class="card">
-                <div class="card-title">
-                    <span class="icon">📦</span> Transferred Files
-                </div>
-                <div class="file-list" id="fileList">
-                    <div class="empty-state">No files transferred yet</div>
-                </div>
-            </div>
-
-            <button class="btn btn-danger" style="margin-top:10px; margin-bottom:30px;" onclick="leaveRoom()">
-                🚪 Leave Room
-            </button>
-        </div>
-
-        <footer>
-            <p>🔒 True P2P transfer — files never touch a server</p>
-            <p style="margin-top: 5px;">PossibilityData © 2026 — Privacy-first, no login, no tracking</p>
-        </footer>
-    </div>
-
-    <!-- QR Modal -->
-    <div class="modal-overlay" id="qrModal">
-        <div class="modal">
-            <h3 id="qrModalTitle">📱 Scan to Join Room</h3>
-            <div class="qr-container" id="qrContainer"></div>
-            <p id="qrModalText" style="color:var(--text-secondary); font-size:0.9rem; margin:8px 0 16px;">
-                Point your camera at this QR code to join instantly
-            </p>
-            <button class="modal-close" onclick="closeQR()">Close</button>
-        </div>
-    </div>
-
-    <!-- QR Scanner Modal -->
-    <div class="modal-overlay" id="scannerModal">
-        <div class="modal">
-            <h3>📷 Scan QR Code</h3>
-            <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
-                Point camera at a PossibilityData room QR code
-            </p>
-            <div class="scanner-container">
-                <div id="qr-reader"></div>
-            </div>
-            <button class="modal-close" onclick="stopQRScanner()">Cancel</button>
-        </div>
-    </div>
-
-    <div class="toast-container" id="toastContainer"></div>
-
-    <script>
-        // ==================== STATE ====================
-        let peer = null;
-        let connections = {};
-        let isHost = false;
-        let myPeerId = null;
-        let myIdentifier = '';
-        let receivedFiles = {};
-        let peerCounter = 0;
-        let html5QrCode = null;
-        const CHUNK_SIZE = 16384;
-
-        // DOM Elements
-        const setupScreen = document.getElementById('setupScreen');
-        const roomScreen = document.getElementById('roomScreen');
-        const hostSection = document.getElementById('hostSection');
-        const roomCodeDisplay = document.getElementById('roomCodeDisplay');
-        const peerList = document.getElementById('peerList');
-        const peerCountBadge = document.getElementById('peerCount');
-        const fileList = document.getElementById('fileList');
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const statusBar = document.getElementById('statusBar');
-        const statusText = document.getElementById('statusText');
-        const showQrBtn = document.getElementById('showQrBtn');
-
-        // ==================== VALIDATION & UTILITIES ====================
-        function sanitizeIdentifier(input) {
-            // Allow lowercase letters, numbers, hyphens, underscores
-            return input.toLowerCase().replace(/[^a-z0-9\-_]/g, '').substring(0, 30);
-        }
-
-        function isValidIdentifier(id) {
-            return /^[a-z0-9\-_]{3,30}$/.test(id);
-        }
-
-        function generateRandomIdentifier() {
-            const words = ['Robot', 'nova', 'Big', 'File', 'core', 'pulse', 'beam', 'Text', 'drive', 'orbit'];
-            const suffix = Math.floor(Math.random() * 10);
-            const word = words[Math.floor(Math.random() * words.length)];
-            return `${word} ${suffix}`;
-        }
-
-        function setIdentifier(value) {
-            document.getElementById('myIdentifier').value = sanitizeIdentifier(value);
-        }
-
-        function generateId(length = 8) {
-            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-            let result = '';
-            for (let i = 0; i < length; i++) {
-                result += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return result;
-        }
-
-        function formatSize(bytes) {
-            if (bytes === 0) return '0 B';
-            const k = 1024;
-            const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-        }
-
-        function getFileIcon(type, name) {
-            if (!type && !name) return '📄';
-            const ext = name ? name.split('.').pop().toLowerCase() : '';
-            if (type?.startsWith('image/')) return '🖼️';
-            if (type?.startsWith('video/')) return '🎬';
-            if (type?.startsWith('audio/')) return '🎵';
-            if (type?.includes('pdf') || ext === 'pdf') return '📕';
-            if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return '📦';
-            if (['doc', 'docx'].includes(ext)) return '📘';
-            if (['xls', 'xlsx'].includes(ext)) return '📊';
-            if (['ppt', 'pptx'].includes(ext)) return '📙';
-            if (['js', 'py', 'html', 'css', 'json', 'xml', 'ts'].includes(ext)) return '💻';
-            if (['apk', 'ipa', 'exe', 'dmg'].includes(ext)) return '⚙️';
-            return '📄';
-        }
-
-        function getIconClass(ext) {
-            const imageExts = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'],
-                videoExts = ['mp4','avi','mov','mkv','webm','flv','wmv'],
-                audioExts = ['mp3','wav','flac','aac','ogg','wma'],
-                docExts = ['pdf'], zipExts = ['zip','rar','7z','tar','gz'],
-                docFileExts = ['doc','docx','txt','rtf','xls','xlsx','csv','ppt','pptx'],
-                codeExts = ['js','html','css','py','java','cpp'];
-            if (imageExts.includes(ext)) return 'icon-image';
-            if (videoExts.includes(ext)) return 'icon-video';
-            if (audioExts.includes(ext)) return 'icon-audio';
-            if (docExts.includes(ext)) return 'icon-pdf';
-            if (zipExts.includes(ext)) return 'icon-zip';
-            if (docFileExts.includes(ext)) return 'icon-doc';
-            if (codeExts.includes(ext)) return 'icon-code';
-            return 'icon-other';
-        }
-
-        function getDeviceName() {
-            const ua = navigator.userAgent;
-            if (/Android/.test(ua)) return 'Android';
-            if (/iPhone|iPad/.test(ua)) return 'iOS';
-            if (/Windows/.test(ua)) return 'Windows';
-            if (/Mac/.test(ua)) return 'Mac';
-            if (/Linux/.test(ua)) return 'Linux';
-            return 'Device';
-        }
-
-        function setStatus(type, text) {
-            statusBar.className = `status-bar ${type}`;
-            statusText.textContent = text;
-        }
-
-        function showScreen(screen) {
-            setupScreen.classList.remove('active');
-            roomScreen.classList.remove('active');
-            screen.classList.add('active');
-        }
-
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type} show`;
-            toast.textContent = message;
-            container.appendChild(toast);
-            setTimeout(() => toast.remove(), 3500);
-        }
-
-        // ==================== QR CODE FUNCTIONS ====================
-        function generateQRCode(data, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            new QRCode(container, {
-                text: data,
-                width: 200,
-                height: 200,
-                correctLevel: QRCode.CorrectLevel.M
-            });
-        }
-
-        function getRoomJoinURL(identifier) {
-            const baseUrl = window.location.href.split('#')[0];
-            return `${baseUrl}#join=${encodeURIComponent(identifier)}`;
-        }
-
-        function showRoomQR() {
-            const identifier = roomCodeDisplay.textContent;
-            if (!identifier || identifier === '------') {
-                showToast('⚠️ No active room to show QR for', 'error');
-                return;
-            }
             
-            const joinURL = getRoomJoinURL(identifier);
-            generateQRCode(joinURL, 'qrContainer');
-            document.getElementById('qrModalTitle').textContent = `📱 Scan to Join: ${identifier}`;
-            document.getElementById('qrModalText').textContent = 'Point camera at this QR code or share the link';
-            document.getElementById('qrModal').classList.add('show');
-        }
+            <!-- Identifier Input -->
+            <div class="input-group">
+                <label>Your Identifier (username)</label>
+                <input type="text" class="input-field identifier" id="myIdentifier" 
+                       placeholder="e.g. Ultrasend" maxlength="30"
+                       pattern="[a-z0-9\-_]+" title="Use lowercase letters, numbers, hyphens, or underscores">
+                <div class="identifier-suggestions">
+                    <span class="suggestion-chip" onclick="setIdentifier('my-device')">my-device</span>
+                    <span class="suggestion-chip" onclick="setIdentifier('office-pc')">office-pc</span>
+                    <span class="suggestion-chip" onclick="setIdentifier('phone-main')">phone-main</span>
+                    <span class="suggestion-chip" onclick="generateRandomIdentifier()">🎲 Random</span>
+                </div>
+            </div>
 
-        function closeQR() {
-            document.getElementById('qrModal').classList.remove('show');
-        }
+            <div class="connection-grid">
+                <div>
+                    <button class="btn btn-primary" id="createRoomBtn" onclick="createRoom()">
+                        ✨ Create Room
+                    </button>
+                    <p style="font-size:12px; color:var(--text-secondary); margin-top:8px; text-align:center;">
+                        Others join using your identifier
+                    </p>
+                    <button class="btn btn-outline" id="showQrBtn" onclick="showRoomQR()" style="margin-top:10px; display:none;">
+                        📱 Show QR Code
+                    </button>
+                </div>
+                <div class="divider">or</div>
+                <div>
+                    <div class="input-group">
+                        <label>Join Room Identifier</label>
+                        <input type="text" class="input-field identifier" id="joinIdentifier" 
+                               placeholder="e.g. ultrasend" maxlength="30">
+                    </div>
+                    <button class="btn btn-success" id="joinRoomBtn" onclick="joinRoom()">
+                        🔗 Join Room
+                    </button>
+                    <button class="btn btn-outline" onclick="startQRScanner()" style="margin-top:10px;">
+                        📷 Scan QR to Join
+                    </button>
+                </div>
+            </div>
 
-        function startQRScanner() {
-            document.getElementById('scannerModal').classList.add('show');
-            
-            html5QrCode = new Html5Qrcode("qr-reader");
-            html5QrCode.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: { width: 200, height: 200 } },
-                (decodedText) => {
-                    // Handle successful scan
-                    stopQRScanner();
-                    handleQRScan(decodedText);
-                },
-                (errorMessage) => {
-                    // Parse error, ignore
-                }
-            ).catch(err => {
-                console.error('QR scanner error:', err);
-                showToast('⚠️ Camera access denied or unavailable', 'error');
+            <div class="how-it-works">
+                <div class="step">
+                    <div class="step-num">1</div>
+                    <p>Set your identifier & create room</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">2</div>
+                    <p>Share QR code or identifier</p>
+                </div>
+                <div class="step">
+                    <div class="step-num">3</div>
+                    <p>Send files directly, no server</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROOM SCREEN -->
+    <div id="roomScreen" class="section">
+        <div id="statusBar" class="status-bar disconnected">
+            <div class="status-dot"></div>
+            <span id="statusText">Disconnected</span>
+        </div>
+
+        <!-- Room Info (Host) -->
+        <div id="hostSection" class="card" style="display:none;">
+            <div class="card-title">
+                <span class="icon">🎫</span> Your Room
+            </div>
+            <p style="font-size:13px; color:var(--text-secondary); margin-bottom:12px;">
+                Share this identifier or QR code for others to join
+            </p>
+            <div class="room-display">
+                <div class="room-code" id="roomCodeDisplay">------</div>
+                <button class="copy-btn" id="copyBtn" onclick="copyRoomCode()" title="Copy">📋</button>
+                <button class="qr-btn" onclick="showRoomQR()" title="Show QR">📱</button>
+            </div>
+            <!-- Inline QR Code Display - Shows Immediately When Room Created -->
+            <div class="inline-qr-container" id="inlineQrContainer" style="display:none;">
+                <div class="inline-qr-label">📱 Scan QR code to join instantly</div>
+                <div class="qr-wrapper" id="inlineQrWrapper"></div>
+            </div>
+        </div>
+
+        <!-- Connected Peers -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">👥</span> Connected Devices
+                <span class="badge" id="peerCount">0</span>
+            </div>
+            <div class="peer-list" id="peerList">
+                <div class="empty-state">No devices connected yet</div>
+            </div>
+        </div>
+
+        <!-- Send Files -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">📤</span> Send Files
+            </div>
+            <div class="drop-zone disabled" id="dropZone">
+                <input type="file" id="fileInput" multiple>
+                <div class="drop-icon">📁</div>
+                <div class="drop-text">Drop files here or tap to browse</div>
+                <div class="drop-subtext">Any file type • No size limit (P2P)</div>
+            </div>
+        </div>
+
+        <!-- Paste & Share -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">📋</span> Paste & Share
+            </div>
+            <div class="paste-field" id="pasteField" contenteditable="true" placeholder="Paste anything here: text, images, files..."></div>
+            <div class="paste-actions">
+                <button class="paste-btn send" onclick="sendPasteContent()">📤 Send to All</button>
+                <button class="paste-btn copy" onclick="clearPasteField()">🗑️ Clear</button>
+            </div>
+            <div class="paste-received" id="pasteReceived">
+                <div class="paste-empty">No shared content yet</div>
+            </div>
+        </div>
+
+        <!-- Files List -->
+        <div class="card">
+            <div class="card-title">
+                <span class="icon">📦</span> Transferred Files
+            </div>
+            <div class="file-list" id="fileList">
+                <div class="empty-state">No files transferred yet</div>
+            </div>
+        </div>
+
+        <button class="btn btn-danger" style="margin-top:10px; margin-bottom:30px;" onclick="leaveRoom()">
+            🚪 Leave Room
+        </button>
+    </div>
+
+    <footer>
+        <p>🔒 True P2P transfer — files never touch a server</p>
+        <p style="margin-top: 5px;">PossibilityData © 2026 — Privacy-first, no login, no tracking</p>
+    </footer>
+</div>
+
+<!-- QR Modal -->
+<div class="modal-overlay" id="qrModal">
+    <div class="modal">
+        <h3 id="qrModalTitle">📱 Scan to Join Room</h3>
+        <div class="qr-container" id="qrContainer"></div>
+        <p id="qrModalText" style="color:var(--text-secondary); font-size:0.9rem; margin:8px 0 16px;">
+            Point your camera at this QR code to join instantly
+        </p>
+        <button class="modal-close" onclick="closeQR()">Close</button>
+    </div>
+</div>
+
+<!-- QR Scanner Modal -->
+<div class="modal-overlay" id="scannerModal">
+    <div class="modal">
+        <h3>📷 Scan QR Code</h3>
+        <p style="color:var(--text-secondary); font-size:0.9rem; margin-bottom:16px;">
+            Point camera at a PossibilityData room QR code
+        </p>
+        <div class="scanner-container">
+            <div id="qr-reader"></div>
+        </div>
+        <button class="modal-close" onclick="stopQRScanner()">Cancel</button>
+    </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+    // ==================== STATE ====================
+    let peer = null;
+    let connections = {};
+    let isHost = false;
+    let myPeerId = null;
+    let myIdentifier = '';
+    let receivedFiles = {};
+    let peerCounter = 0;
+    let html5QrCode = null;
+    const CHUNK_SIZE = 16384;
+    let pasteCounter = 0;
+
+    // DOM Elements
+    const setupScreen = document.getElementById('setupScreen');
+    const roomScreen = document.getElementById('roomScreen');
+    const hostSection = document.getElementById('hostSection');
+    const roomCodeDisplay = document.getElementById('roomCodeDisplay');
+    const peerList = document.getElementById('peerList');
+    const peerCountBadge = document.getElementById('peerCount');
+    const fileList = document.getElementById('fileList');
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statusBar = document.getElementById('statusBar');
+    const statusText = document.getElementById('statusText');
+    const showQrBtn = document.getElementById('showQrBtn');
+
+    // ==================== VALIDATION & UTILITIES ====================
+    function sanitizeIdentifier(input) {
+        // Allow lowercase letters, numbers, hyphens, underscores
+        return input.toLowerCase().replace(/[^a-z0-9\-_]/g, '').substring(0, 30);
+    }
+
+    function isValidIdentifier(id) {
+        return /^[a-z0-9\-_]{3,30}$/.test(id);
+    }
+
+    function generateRandomIdentifier() {
+        const words = ['Robot', 'nova', 'Big', 'File', 'core', 'pulse', 'beam', 'Text', 'drive', 'orbit'];
+        const suffix = Math.floor(Math.random() * 10);
+        const word = words[Math.floor(Math.random() * words.length)];
+        return `${word} ${suffix}`;
+    }
+
+    function setIdentifier(value) {
+        document.getElementById('myIdentifier').value = sanitizeIdentifier(value);
+    }
+
+    function generateId(length = 8) {
+        const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    function formatSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+    }
+
+    function getFileIcon(type, name) {
+        if (!type && !name) return '📄';
+        const ext = name ? name.split('.').pop().toLowerCase() : '';
+        if (type?.startsWith('image/')) return '🖼️';
+        if (type?.startsWith('video/')) return '🎬';
+        if (type?.startsWith('audio/')) return '🎵';
+        if (type?.includes('pdf') || ext === 'pdf') return '📕';
+        if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) return '📦';
+        if (['doc', 'docx'].includes(ext)) return '📘';
+        if (['xls', 'xlsx'].includes(ext)) return '📊';
+        if (['ppt', 'pptx'].includes(ext)) return '📙';
+        if (['js', 'py', 'html', 'css', 'json', 'xml', 'ts'].includes(ext)) return '💻';
+        if (['apk', 'ipa', 'exe', 'dmg'].includes(ext)) return '⚙️';
+        return '📄';
+    }
+
+    function getIconClass(ext) {
+        const imageExts = ['jpg','jpeg','png','gif','svg','webp','bmp','ico'],
+            videoExts = ['mp4','avi','mov','mkv','webm','flv','wmv'],
+            audioExts = ['mp3','wav','flac','aac','ogg','wma'],
+            docExts = ['pdf'], zipExts = ['zip','rar','7z','tar','gz'],
+            docFileExts = ['doc','docx','txt','rtf','xls','xlsx','csv','ppt','pptx'],
+            codeExts = ['js','html','css','py','java','cpp'];
+        if (imageExts.includes(ext)) return 'icon-image';
+        if (videoExts.includes(ext)) return 'icon-video';
+        if (audioExts.includes(ext)) return 'icon-audio';
+        if (docExts.includes(ext)) return 'icon-pdf';
+        if (zipExts.includes(ext)) return 'icon-zip';
+        if (docFileExts.includes(ext)) return 'icon-doc';
+        if (codeExts.includes(ext)) return 'icon-code';
+        return 'icon-other';
+    }
+
+    function getDeviceName() {
+        const ua = navigator.userAgent;
+        if (/Android/.test(ua)) return 'Android';
+        if (/iPhone|iPad/.test(ua)) return 'iOS';
+        if (/Windows/.test(ua)) return 'Windows';
+        if (/Mac/.test(ua)) return 'Mac';
+        if (/Linux/.test(ua)) return 'Linux';
+        return 'Device';
+    }
+
+    function setStatus(type, text) {
+        statusBar.className = `status-bar ${type}`;
+        statusText.textContent = text;
+    }
+
+    function showScreen(screen) {
+        setupScreen.classList.remove('active');
+        roomScreen.classList.remove('active');
+        screen.classList.add('active');
+    }
+
+    function showToast(message, type = 'success') {
+        const container = document.getElementById('toastContainer');
+        const toast = document.createElement('div');
+        toast.className = `toast ${type} show`;
+        toast.textContent = message;
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
+
+    // ==================== QR CODE FUNCTIONS ====================
+    function generateQRCode(data, containerId) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        new QRCode(container, {
+            text: data,
+            width: 200,
+            height: 200,
+            correctLevel: QRCode.CorrectLevel.M
+        });
+    }
+
+    function getRoomJoinURL(identifier) {
+        // Get the base URL without any hash or query params
+        const baseUrl = window.location.href.split('#')[0].split('?')[0];
+        // Return URL with hash parameter for joining
+        return `${baseUrl}#join=${encodeURIComponent(identifier)}`;
+    }
+
+    function showRoomQR() {
+        const identifier = roomCodeDisplay.textContent;
+        if (!identifier || identifier === '------') {
+            showToast('⚠️ No active room to show QR for', 'error');
+            return;
+        }
+        
+        const joinURL = getRoomJoinURL(identifier);
+        generateQRCode(joinURL, 'qrContainer');
+        document.getElementById('qrModalTitle').textContent = `📱 Scan to Join: ${identifier}`;
+        document.getElementById('qrModalText').textContent = 'Point camera at this QR code or share the link';
+        document.getElementById('qrModal').classList.add('show');
+    }
+
+    function closeQR() {
+        document.getElementById('qrModal').classList.remove('show');
+    }
+
+    function startQRScanner() {
+        document.getElementById('scannerModal').classList.add('show');
+        
+        html5QrCode = new Html5Qrcode("qr-reader");
+        html5QrCode.start(
+            { facingMode: "environment" },
+            { fps: 10, qrbox: { width: 200, height: 200 } },
+            (decodedText) => {
+                // Handle successful scan
                 stopQRScanner();
-            });
-        }
-
-        function stopQRScanner() {
-            document.getElementById('scannerModal').classList.remove('show');
-            if (html5QrCode) {
-                html5QrCode.stop().then(() => {
-                    html5QrCode.clear();
-                }).catch(err => console.error('Stop error:', err));
+                handleQRScan(decodedText);
+            },
+            (errorMessage) => {
+                // Parse error, ignore
             }
-        }
+        ).catch(err => {
+            console.error('QR scanner error:', err);
+            showToast('⚠️ Camera access denied or unavailable', 'error');
+            stopQRScanner();
+        });
+    }
 
-        function handleQRScan(decodedText) {
-            // Parse PossibilityData join URLs
-            if (decodedText.includes('#join=')) {
-                const identifier = decodedText.split('#join=')[1];
-                if (identifier) {
-                    document.getElementById('joinIdentifier').value = decodeURIComponent(identifier);
-                    joinRoom();
-                    showToast('✅ Joining room from QR code...', 'success');
-                    return;
-                }
-            }
-            // Also support plain identifiers
-            if (isValidIdentifier(decodedText)) {
-                document.getElementById('joinIdentifier').value = decodedText;
+    function stopQRScanner() {
+        document.getElementById('scannerModal').classList.remove('show');
+        if (html5QrCode) {
+            html5QrCode.stop().then(() => {
+                html5QrCode.clear();
+            }).catch(err => console.error('Stop error:', err));
+        }
+    }
+
+    function handleQRScan(decodedText) {
+        // Parse PossibilityData join URLs - handle both full URLs and plain identifiers
+        if (decodedText.includes('#join=')) {
+            const parts = decodedText.split('#join=');
+            const identifier = parts[parts.length - 1]; // Get last part in case URL has multiple hashes
+            if (identifier) {
+                document.getElementById('joinIdentifier').value = decodeURIComponent(identifier);
                 joinRoom();
-                showToast('✅ Joining room...', 'success');
+                showToast('✅ Joining room from QR code...', 'success');
                 return;
             }
-            showToast('⚠️ Invalid QR code format', 'error');
         }
-
-        // Check for join URL on load
-        function checkJoinFromURL() {
-            const hash = window.location.hash;
-            if (hash.startsWith('#join=')) {
-                const identifier = decodeURIComponent(hash.substring(6));
-                if (isValidIdentifier(identifier)) {
-                    document.getElementById('joinIdentifier').value = identifier;
-                    // Auto-join after short delay for UX
-                    setTimeout(() => {
-                        if (document.getElementById('joinIdentifier').value === identifier) {
-                            joinRoom();
-                            showToast('🎯 Auto-joining from URL...', 'success');
-                        }
-                    }, 500);
-                }
-                // Clear hash to avoid re-joining on refresh
-                history.replaceState(null, null, window.location.pathname);
-            }
+        // Also support plain identifiers (for backwards compatibility)
+        if (isValidIdentifier(decodedText)) {
+            document.getElementById('joinIdentifier').value = decodedText;
+            joinRoom();
+            showToast('✅ Joining room...', 'success');
+            return;
         }
+        showToast('⚠️ Invalid QR code format', 'error');
+    }
 
-        // ==================== PEER SETUP ====================
-        function createRoom() {
-            let identifier = document.getElementById('myIdentifier').value.trim();
-            
-            // Validate or generate identifier
-            if (!identifier || !isValidIdentifier(identifier)) {
-                identifier = generateRandomIdentifier();
-                document.getElementById('myIdentifier').value = identifier;
-                showToast(`🎲 Using identifier: ${identifier}`);
-            }
-            
-            identifier = sanitizeIdentifier(identifier);
-            myIdentifier = identifier;
-
-            const btn = document.getElementById('createRoomBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Creating...';
-
-            peer = new Peer(identifier, {
-                debug: 1,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' }
-                    ]
-                }
-            });
-
-            peer.on('open', (id) => {
-                myPeerId = id;
-                isHost = true;
-                showScreen(roomScreen);
-                hostSection.style.display = 'block';
-                roomCodeDisplay.textContent = id;
-                showQrBtn.style.display = 'inline-flex';
-                setStatus('connecting', `Room "${id}" created — waiting for peers...`);
-                enableDropZone();
-                showToast(`✅ Room created! Identifier: ${id}`);
-                btn.disabled = false;
-                btn.innerHTML = '✨ Create Room';
-            });
-
-            peer.on('connection', (conn) => {
-                handleConnection(conn);
-            });
-
-            peer.on('error', (err) => {
-                console.error('Peer error:', err);
-                if (err.type === 'unavailable-id') {
-                    showToast(`❌ Identifier "${identifier}" is taken. Try another.`, 'error');
-                    peer.destroy();
-                    peer = null;
-                    btn.disabled = false;
-                    btn.innerHTML = '✨ Create Room';
-                    return;
-                }
-                showToast(`❌ Error: ${err.type || err.message}`, 'error');
-                btn.disabled = false;
-                btn.innerHTML = '✨ Create Room';
-            });
-
-            peer.on('disconnected', () => {
-                setStatus('disconnected', 'Disconnected from signaling server');
-                showToast('⚠️ Disconnected — reconnecting...');
+    // Check for join URL on load
+    function checkJoinFromURL() {
+        const hash = window.location.hash;
+        if (hash.startsWith('#join=')) {
+            const identifier = decodeURIComponent(hash.substring(6));
+            if (isValidIdentifier(identifier)) {
+                document.getElementById('joinIdentifier').value = identifier;
+                // Auto-join after short delay for UX
                 setTimeout(() => {
-                    if (peer && !peer.destroyed) peer.reconnect();
-                }, 2000);
-            });
-        }
-
-        function joinRoom() {
-            let identifier = document.getElementById('joinIdentifier').value.trim().toLowerCase();
-            
-            if (!identifier || !isValidIdentifier(identifier)) {
-                showToast('⚠️ Please enter a valid identifier (3-30 chars, lowercase, numbers, - or _)', 'error');
-                return;
-            }
-            
-            identifier = sanitizeIdentifier(identifier);
-
-            const btn = document.getElementById('joinRoomBtn');
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner"></span> Joining...';
-
-            // Generate unique peer ID for this client (append random suffix to avoid conflicts)
-            const uniquePeerId = `${identifier}-client-${generateId(4)}`;
-            
-            peer = new Peer(uniquePeerId, {
-                debug: 1,
-                config: {
-                    iceServers: [
-                        { urls: 'stun:stun.l.google.com:19302' },
-                        { urls: 'stun:stun1.l.google.com:19302' },
-                        { urls: 'stun:stun2.l.google.com:19302' }
-                    ]
-                }
-            });
-
-            peer.on('open', (id) => {
-                myPeerId = id;
-                myIdentifier = identifier; // Store the room identifier we're joining
-                isHost = false;
-                showScreen(roomScreen);
-                hostSection.style.display = 'none';
-                showQrBtn.style.display = 'none';
-
-                // Connect to the host peer
-                const conn = peer.connect(identifier, {
-                    reliable: true,
-                    metadata: { 
-                        name: getDeviceName(),
-                        identifier: uniquePeerId,
-                        displayName: `${getDeviceName()} (${uniquePeerId.slice(-4)})`
+                    if (document.getElementById('joinIdentifier').value === identifier) {
+                        joinRoom();
+                        showToast('🎯 Auto-joining from URL...', 'success');
                     }
-                });
-
-                handleConnection(conn);
-                btn.disabled = false;
-                btn.innerHTML = '🔗 Join Room';
-            });
-
-            peer.on('error', (err) => {
-                console.error('Peer error:', err);
-                if (err.type === 'peer-unavailable') {
-                    showToast(`❌ Room "${identifier}" not found. Check the identifier.`, 'error');
-                } else {
-                    showToast(`❌ Error: ${err.type || err.message}`, 'error');
-                }
-                btn.disabled = false;
-                btn.innerHTML = '🔗 Join Room';
-            });
-
-            peer.on('disconnected', () => {
-                setStatus('disconnected', 'Disconnected');
-                setTimeout(() => {
-                    if (peer && !peer.destroyed) peer.reconnect();
-                }, 2000);
-            });
-        }
-
-        // ==================== CONNECTION HANDLER ====================
-        function handleConnection(conn) {
-            const peerId = conn.peer;
-            setStatus('connecting', 'Connecting to peer...');
-
-            conn.on('open', () => {
-                connections[peerId] = conn;
-                peerCounter++;
-                updatePeerList();
-                updateStatus();
-                enableDropZone();
-                showToast('🎉 Device connected!');
-                announceExistingFiles(conn);
-            });
-
-            conn.on('data', (data) => {
-                if (data.type === 'file') {
-                    receiveFile(data, peerId);
-                } else if (data.type === 'file-announce') {
-                    addReceivedFile(data.fileInfo, null, true);
-                } else if (data.type === 'chat') {
-                    showToast('💬 ' + data.message);
-                } else if (data.type === 'peer-info') {
-                    // Update peer display name if provided
-                    updatePeerDisplayName(peerId, data.displayName);
-                }
-            });
-
-            conn.on('close', () => {
-                delete connections[peerId];
-                updatePeerList();
-                updateStatus();
-                showToast('👋 A device disconnected');
-                if (Object.keys(connections).length === 0) {
-                    disableDropZone();
-                }
-            });
-
-            conn.on('error', (err) => {
-                console.error('Connection error:', err);
-                delete connections[peerId];
-                updatePeerList();
-                updateStatus();
-            });
-        }
-
-        function updatePeerDisplayName(peerId, displayName) {
-            const peerEl = document.querySelector(`[data-peer-id="${peerId}"] .peer-name`);
-            if (peerEl && displayName) {
-                peerEl.textContent = displayName;
+                }, 500);
             }
+            // Clear hash to avoid re-joining on refresh
+            history.replaceState(null, null, window.location.pathname);
         }
+    }
 
-        // ==================== FILE TRANSFER ====================
-        function sendFile(file) {
-            if (Object.keys(connections).length === 0) {
-                showToast('⚠️ No devices connected');
-                return;
-            }
-
-            const fileId = generateId(10);
-            const fileInfo = {
-                id: fileId,
-                name: file.name,
-                size: file.size,
-                type: file.type,
-                lastModified: file.lastModified,
-                sender: myPeerId,
-                timestamp: Date.now()
-            };
-
-            addSentFile(fileInfo);
-
-            const reader = new FileReader();
-            let offset = 0;
-
-            function sendChunk() {
-                const chunk = file.slice(offset, offset + CHUNK_SIZE);
-                reader.readAsArrayBuffer(chunk);
-            }
-
-            reader.onload = (e) => {
-                const data = {
-                    type: 'file',
-                    fileId: fileId,
-                    fileName: file.name,
-                    fileType: file.type,
-                    fileSize: file.size,
-                    chunk: e.target.result,
-                    offset: offset,
-                    lastChunk: offset + CHUNK_SIZE >= file.size,
-                    sender: myPeerId
-                };
-
-                for (const peerId in connections) {
-                    try {
-                        connections[peerId].send(data);
-                    } catch (err) {
-                        console.error('Send error to', peerId, err);
-                    }
-                }
-
-                offset += CHUNK_SIZE;
-                updateFileProgress(fileId, offset, file.size);
-
-                if (offset < file.size) {
-                    sendChunk();
-                } else {
-                    completeFileTransfer(fileId);
-                }
-            };
-
-            sendChunk();
-        }
-
-        function receiveFile(data, fromPeerId) {
-            const fileId = data.fileId;
-
-            if (!receivedFiles[fileId]) {
-                receivedFiles[fileId] = {
-                    chunks: [],
-                    received: 0,
-                    total: data.fileSize,
-                    name: data.fileName,
-                    type: data.fileType
-                };
-                addReceivedFile({
-                    id: fileId,
-                    name: data.fileName,
-                    size: data.fileSize,
-                    type: data.fileType,
-                    sender: fromPeerId,
-                    timestamp: Date.now()
-                }, fileId);
-            }
-
-            const rf = receivedFiles[fileId];
-            rf.chunks[data.offset] = data.chunk;
-            rf.received += data.chunk?.byteLength || 0;
-
-            updateFileProgress(fileId, rf.received, rf.total);
-
-            if (data.lastChunk) {
-                completeReceive(fileId);
-            }
-        }
-
-        function completeReceive(fileId) {
-            const rf = receivedFiles[fileId];
-            if (!rf) return;
-
-            const blob = new Blob(Object.values(rf.chunks).filter(c => c), { type: rf.type });
-            const url = URL.createObjectURL(blob);
-
-            const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
-            if (fileEl) {
-                const progressFill = fileEl.querySelector('.progress-fill');
-                if (progressFill) {
-                    progressFill.style.width = '100%';
-                    progressFill.classList.add('complete');
-                }
-                const dlBtn = fileEl.querySelector('.file-btn.download');
-                if (dlBtn) {
-                    dlBtn.style.display = '';
-                    dlBtn.onclick = () => {
-                        const a = document.createElement('a');
-                        a.href = url;
-                        a.download = rf.name;
-                        a.click();
-                        setTimeout(() => URL.revokeObjectURL(url), 100);
-                    };
-                }
-                const meta = fileEl.querySelector('.file-meta');
-                if (meta) meta.textContent = `${formatSize(rf.total)} • ✅ Received`;
-            }
-
-            showToast('✅ Received: ' + rf.name);
-            delete receivedFiles[fileId];
-        }
-
-        function completeFileTransfer(fileId) {
-            const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
-            if (fileEl) {
-                const progressFill = fileEl.querySelector('.progress-fill');
-                if (progressFill) {
-                    progressFill.style.width = '100%';
-                    progressFill.classList.add('complete');
-                }
-                const meta = fileEl.querySelector('.file-meta');
-                if (meta) meta.textContent = '✅ Sent to all devices';
-            }
-            showToast('✅ File sent successfully!');
-        }
-
-        function announceExistingFiles(conn) {
-            document.querySelectorAll('.file-item[data-direction="sent"]').forEach(el => {
-                const fileId = el.dataset.fileId;
-                const name = el.querySelector('.file-name')?.textContent || '';
-                const meta = el.querySelector('.file-meta')?.textContent || '';
-                const sizeMatch = meta.match(/([\d.]+\s*[KMGT]?B)/);
-                const size = sizeMatch ? parseSize(sizeMatch[1]) : 0;
-                conn.send({
-                    type: 'file-announce',
-                    fileInfo: { 
-                        id: fileId, 
-                        name, 
-                        size, 
-                        type: 'application/octet-stream', 
-                        sender: 'previous', 
-                        timestamp: Date.now() 
-                    }
-                });
-            });
-        }
-
-        function parseSize(str) {
-            const match = str.match(/([\d.]+)\s*([KMGT]?B)/i);
-            if (!match) return 0;
-            const val = parseFloat(match[1]);
-            const unit = match[2].toUpperCase();
-            const multipliers = { 'B': 1, 'KB': 1024, 'MB': 1048576, 'GB': 1073741824, 'TB': 1099511627776 };
-            return val * (multipliers[unit] || 1);
-        }
-
-        // ==================== UI HELPERS ====================
-        function addSentFile(fileInfo) {
-            const emptyState = fileList.querySelector('.empty-state');
-            if (emptyState) emptyState.remove();
-
-            const div = document.createElement('div');
-            div.className = 'file-item';
-            div.dataset.fileId = fileInfo.id;
-            div.dataset.direction = 'sent';
-            div.innerHTML = `
-                <div class="file-icon ${getIconClass(fileInfo.name?.split('.').pop()?.toLowerCase())}">
-                    ${getFileIcon(fileInfo.type, fileInfo.name)}
-                </div>
-                <div class="file-info">
-                    <div class="file-name" title="${fileInfo.name}">${fileInfo.name}</div>
-                    <div class="file-meta">${formatSize(fileInfo.size)} • Sending...</div>
-                    <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
-                </div>
-                <div class="file-actions">
-                    <button class="file-btn remove" onclick="removeFile(this)">✕</button>
-                </div>
-            `;
-            fileList.prepend(div);
-        }
-
-        function addReceivedFile(fileInfo, fileId, isAnnouncement = false) {
-            const emptyState = fileList.querySelector('.empty-state');
-            if (emptyState) emptyState.remove();
-
-            if (document.querySelector(`[data-file-id="${fileInfo.id}"]`)) return;
-
-            const div = document.createElement('div');
-            div.className = 'file-item';
-            div.dataset.fileId = fileId || fileInfo.id;
-            div.dataset.direction = 'received';
-
-            const progressHtml = !isAnnouncement ?
-                `<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>` : '';
-            const downloadStyle = isAnnouncement ? 'display:none;' : 'display:none;';
-            const metaText = isAnnouncement ? '📋 Available' : 'Receiving...';
-
-            div.innerHTML = `
-                <div class="file-icon ${getIconClass(fileInfo.name?.split('.').pop()?.toLowerCase())}">
-                    ${getFileIcon(fileInfo.type, fileInfo.name)}
-                </div>
-                <div class="file-info">
-                    <div class="file-name" title="${fileInfo.name}">${fileInfo.name}</div>
-                    <div class="file-meta">${formatSize(fileInfo.size)} • ${metaText}</div>
-                    ${progressHtml}
-                </div>
-                <div class="file-actions">
-                    <button class="file-btn download" style="${downloadStyle}">⬇ Download</button>
-                    <button class="file-btn remove" onclick="removeFile(this)">✕</button>
-                </div>
-            `;
-            fileList.prepend(div);
-        }
-
-        function updateFileProgress(fileId, received, total) {
-            const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
-            if (!fileEl) return;
-            
-            const fill = fileEl.querySelector('.progress-fill');
-            if (fill) {
-                fill.style.width = Math.min(100, (received / total * 100)).toFixed(1) + '%';
-            }
-            const meta = fileEl.querySelector('.file-meta');
-            if (meta && !fill?.classList.contains('complete')) {
-                const pct = (received / total * 100).toFixed(0);
-                meta.textContent = `${formatSize(received)} / ${formatSize(total)} • ${pct}%`;
-            }
-        }
-
-        function removeFile(btn) {
-            const item = btn.closest('.file-item');
-            item.style.animation = 'toastOut 0.3s ease forwards';
-            setTimeout(() => item.remove(), 300);
-        }
-
-        function updatePeerList() {
-            const peers = Object.keys(connections);
-            peerCountBadge.textContent = peers.length;
-
-            if (peers.length === 0) {
-                peerList.innerHTML = '<div class="empty-state">No devices connected yet</div>';
-                return;
-            }
-
-            peerList.innerHTML = '';
-            
-            // Show self first
-            const selfDiv = document.createElement('div');
-            selfDiv.className = 'peer-item';
-            selfDiv.innerHTML = `
-                <div class="peer-avatar">👤</div>
-                <div class="peer-name peer-you">${myIdentifier || 'You'} (you)</div>
-                <div class="peer-status">● Online</div>
-            `;
-            peerList.appendChild(selfDiv);
-            
-            // Show connected peers
-            peers.forEach((peerId, i) => {
-                const conn = connections[peerId];
-                const meta = conn?.metadata || {};
-                const displayName = meta.displayName || `${meta.name || 'Device'} ${i + 1}`;
-                
-                const div = document.createElement('div');
-                div.className = 'peer-item';
-                div.dataset.peerId = peerId;
-                div.innerHTML = `
-                    <div class="peer-avatar">📱</div>
-                    <div class="peer-name">${displayName}</div>
-                    <div class="peer-status">● Online</div>
-                `;
-                peerList.appendChild(div);
-                
-                // Send our info to this peer
-                conn?.send({
-                    type: 'peer-info',
-                    displayName: `${getDeviceName()} (${myPeerId?.slice(-4) || '???'})`
-                });
-            });
-        }
-
-        function updateStatus() {
-            const count = Object.keys(connections).length;
-            if (count === 0) {
-                setStatus('disconnected', 'No devices connected');
-            } else {
-                setStatus('connected', `${count} device${count > 1 ? 's' : ''} connected`);
-            }
-        }
-
-        function enableDropZone() {
-            dropZone.classList.remove('disabled');
-        }
-
-        function disableDropZone() {
-            dropZone.classList.add('disabled');
-        }
-
-        // ==================== EVENT LISTENERS ====================
-        fileInput.addEventListener('change', (e) => {
-            Array.from(e.target.files).forEach(file => sendFile(file));
-            fileInput.value = '';
-        });
-
-        dropZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropZone.classList.add('dragover');
-        });
-
-        dropZone.addEventListener('dragleave', () => {
-            dropZone.classList.remove('dragover');
-        });
-
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('dragover');
-            Array.from(e.dataTransfer.files).forEach(file => sendFile(file));
-        });
-
-        // Identifier input handling
-        document.getElementById('myIdentifier')?.addEventListener('input', (e) => {
-            e.target.value = sanitizeIdentifier(e.target.value);
-        });
+    // ==================== PEER SETUP ====================
+    function createRoom() {
+        let identifier = document.getElementById('myIdentifier').value.trim();
         
-        document.getElementById('joinIdentifier')?.addEventListener('input', (e) => {
-            e.target.value = sanitizeIdentifier(e.target.value);
-        });
-        
-        document.getElementById('joinIdentifier')?.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') joinRoom();
-        });
-
-        // ==================== UTILITIES ====================
-        function copyRoomCode() {
-            const code = roomCodeDisplay.textContent;
-            if (!code || code === '------') {
-                showToast('⚠️ No room code to copy', 'error');
-                return;
-            }
-            
-            navigator.clipboard.writeText(code).then(() => {
-                const btn = document.getElementById('copyBtn');
-                btn.classList.add('copied');
-                btn.textContent = '✅';
-                setTimeout(() => {
-                    btn.classList.remove('copied');
-                    btn.textContent = '📋';
-                }, 2000);
-                showToast('📋 Identifier copied to clipboard!');
-            }).catch(() => {
-                const ta = document.createElement('textarea');
-                ta.value = code;
-                document.body.appendChild(ta);
-                ta.select();
-                document.execCommand('copy');
-                document.body.removeChild(ta);
-                showToast('📋 Identifier copied!');
-            });
+        // Validate or generate identifier
+        if (!identifier || !isValidIdentifier(identifier)) {
+            identifier = generateRandomIdentifier();
+            document.getElementById('myIdentifier').value = identifier;
+            showToast(`🎲 Using identifier: ${identifier}`);
         }
+        
+        identifier = sanitizeIdentifier(identifier);
+        myIdentifier = identifier;
 
-        function leaveRoom() {
-            // Close all connections
-            Object.values(connections).forEach(conn => {
-                try { conn.close(); } catch(e) {}
-            });
-            connections = {};
+        const btn = document.getElementById('createRoomBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Creating...';
+
+        peer = new Peer(identifier, {
+            debug: 1,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' }
+                ]
+            }
+        });
+
+        peer.on('open', (id) => {
+            myPeerId = id;
+            isHost = true;
+            showScreen(roomScreen);
+            hostSection.style.display = 'block';
+            roomCodeDisplay.textContent = id;
+            showQrBtn.style.display = 'inline-flex';
             
-            // Destroy peer
-            if (peer) {
-                try { peer.destroy(); } catch(e) {}
+            // Generate and display inline QR code immediately
+            const joinURL = getRoomJoinURL(id);
+            generateQRCode(joinURL, 'inlineQrWrapper');
+            document.getElementById('inlineQrContainer').style.display = 'block';
+            
+            setStatus('connecting', `Room "${id}" created — waiting for peers...`);
+            enableDropZone();
+            showToast(`✅ Room created! Identifier: ${id}`);
+            btn.disabled = false;
+            btn.innerHTML = '✨ Create Room';
+        });
+
+        peer.on('connection', (conn) => {
+            handleConnection(conn);
+        });
+
+        peer.on('error', (err) => {
+            console.error('Peer error:', err);
+            if (err.type === 'unavailable-id') {
+                showToast(`❌ Identifier "${identifier}" is taken. Try another.`, 'error');
+                peer.destroy();
                 peer = null;
+                btn.disabled = false;
+                btn.innerHTML = '✨ Create Room';
+                return;
             }
-            
-            // Reset state
-            receivedFiles = {};
+            showToast(`❌ Error: ${err.type || err.message}`, 'error');
+            btn.disabled = false;
+            btn.innerHTML = '✨ Create Room';
+        });
+
+        peer.on('disconnected', () => {
+            setStatus('disconnected', 'Disconnected from signaling server');
+            showToast('⚠️ Disconnected — reconnecting...');
+            setTimeout(() => {
+                if (peer && !peer.destroyed) peer.reconnect();
+            }, 2000);
+        });
+    }
+
+    function joinRoom() {
+        let identifier = document.getElementById('joinIdentifier').value.trim().toLowerCase();
+        
+        if (!identifier || !isValidIdentifier(identifier)) {
+            showToast('⚠️ Please enter a valid identifier (3-30 chars, lowercase, numbers, - or _)', 'error');
+            return;
+        }
+        
+        identifier = sanitizeIdentifier(identifier);
+
+        const btn = document.getElementById('joinRoomBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner"></span> Joining...';
+
+        // Generate unique peer ID for this client (append random suffix to avoid conflicts)
+        const uniquePeerId = `${identifier}-client-${generateId(4)}`;
+        
+        peer = new Peer(uniquePeerId, {
+            debug: 1,
+            config: {
+                iceServers: [
+                    { urls: 'stun:stun.l.google.com:19302' },
+                    { urls: 'stun:stun1.l.google.com:19302' },
+                    { urls: 'stun:stun2.l.google.com:19302' }
+                ]
+            }
+        });
+
+        peer.on('open', (id) => {
+            myPeerId = id;
+            myIdentifier = identifier; // Store the room identifier we're joining
             isHost = false;
-            myPeerId = null;
-            peerCounter = 0;
-            
-            // Reset UI
-            showScreen(setupScreen);
+            showScreen(roomScreen);
             hostSection.style.display = 'none';
             showQrBtn.style.display = 'none';
-            document.getElementById('createRoomBtn').disabled = false;
-            document.getElementById('createRoomBtn').innerHTML = '✨ Create Room';
-            document.getElementById('joinRoomBtn').disabled = false;
-            document.getElementById('joinRoomBtn').innerHTML = '🔗 Join Room';
-            document.getElementById('joinIdentifier').value = '';
-            fileList.innerHTML = '<div class="empty-state">No files transferred yet</div>';
-            peerList.innerHTML = '<div class="empty-state">No devices connected yet</div>';
-            disableDropZone();
+
+            // Connect to the host peer
+            const conn = peer.connect(identifier, {
+                reliable: true,
+                metadata: { 
+                    name: getDeviceName(),
+                    identifier: uniquePeerId,
+                    displayName: `${getDeviceName()} (${uniquePeerId.slice(-4)})`
+                }
+            });
+
+            handleConnection(conn);
+            btn.disabled = false;
+            btn.innerHTML = '🔗 Join Room';
+        });
+
+        peer.on('error', (err) => {
+            console.error('Peer error:', err);
+            if (err.type === 'peer-unavailable') {
+                showToast(`❌ Room "${identifier}" not found. Check the identifier.`, 'error');
+            } else {
+                showToast(`❌ Error: ${err.type || err.message}`, 'error');
+            }
+            btn.disabled = false;
+            btn.innerHTML = '🔗 Join Room';
+        });
+
+        peer.on('disconnected', () => {
             setStatus('disconnected', 'Disconnected');
-            
-            // Stop any active QR scanner
-            stopQRScanner();
-            
-            showToast('🚪 Left room');
+            setTimeout(() => {
+                if (peer && !peer.destroyed) peer.reconnect();
+            }, 2000);
+        });
+    }
+
+    // ==================== CONNECTION HANDLER ====================
+    function handleConnection(conn) {
+        const peerId = conn.peer;
+        setStatus('connecting', 'Connecting to peer...');
+
+        conn.on('open', () => {
+            connections[peerId] = conn;
+            peerCounter++;
+            updatePeerList();
+            updateStatus();
+            enableDropZone();
+            showToast('🎉 Device connected!');
+            announceExistingFiles(conn);
+        });
+
+        conn.on('data', (data) => {
+            if (data.type === 'file') {
+                receiveFile(data, peerId);
+            } else if (data.type === 'file-announce') {
+                addReceivedFile(data.fileInfo, null, true);
+            } else if (data.type === 'chat') {
+                showToast('💬 ' + data.message);
+            } else if (data.type === 'peer-info') {
+                // Update peer display name if provided
+                updatePeerDisplayName(peerId, data.displayName);
+            } else if (data.type === 'paste') {
+                receivePasteContent(data, peerId);
+            }
+        });
+
+        conn.on('close', () => {
+            delete connections[peerId];
+            updatePeerList();
+            updateStatus();
+            showToast('👋 A device disconnected');
+            if (Object.keys(connections).length === 0) {
+                disableDropZone();
+            }
+        });
+
+        conn.on('error', (err) => {
+            console.error('Connection error:', err);
+            delete connections[peerId];
+            updatePeerList();
+            updateStatus();
+        });
+    }
+
+    function updatePeerDisplayName(peerId, displayName) {
+        const peerEl = document.querySelector(`[data-peer-id="${peerId}"] .peer-name`);
+        if (peerEl && displayName) {
+            peerEl.textContent = displayName;
+        }
+    }
+
+    // ==================== PASTE FIELD FUNCTIONS ====================
+    function handlePasteFieldPaste(e) {
+        e.preventDefault();
+        const clipboardData = e.clipboardData || window.clipboardData;
+        const items = clipboardData.items;
+        
+        for (let i = 0; i < items.length; i++) {
+            const item = items[i];
+            if (item.type.indexOf('text') !== -1) {
+                item.getAsString((text) => {
+                    insertTextAtCursor(text);
+                });
+            } else if (item.type.indexOf('image') !== -1) {
+                const blob = item.getAsFile();
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const img = document.createElement('img');
+                    img.src = event.target.result;
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '8px';
+                    img.style.margin = '4px 0';
+                    insertElementAtCursor(img);
+                };
+                reader.readAsDataURL(blob);
+            }
+        }
+    }
+    
+    function insertTextAtCursor(text) {
+        const pasteField = document.getElementById('pasteField');
+        pasteField.focus();
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(document.createTextNode(text));
+        range.collapse(false);
+    }
+    
+    function insertElementAtCursor(element) {
+        const pasteField = document.getElementById('pasteField');
+        pasteField.focus();
+        const selection = window.getSelection();
+        if (!selection.rangeCount) return;
+        const range = selection.getRangeAt(0);
+        range.deleteContents();
+        range.insertNode(element);
+        range.collapse(false);
+    }
+    
+    function sendPasteContent() {
+        if (Object.keys(connections).length === 0) {
+            showToast('⚠️ No devices connected');
+            return;
+        }
+        const pasteField = document.getElementById('pasteField');
+        const content = pasteField.innerHTML;
+        const textContent = pasteField.textContent || pasteField.innerText;
+        
+        if (!content || content === '<br>' || !textContent.trim()) {
+            showToast('⚠️ Nothing to send');
+            return;
+        }
+        
+        const pasteId = 'paste-' + generateId(8);
+        const pasteData = {
+            type: 'paste',
+            pasteId: pasteId,
+            content: content,
+            textContent: textContent.trim(),
+            sender: myPeerId,
+            senderName: myIdentifier,
+            timestamp: Date.now()
+        };
+        
+        // Send to all connected peers
+        for (const peerId in connections) {
+            try {
+                connections[peerId].send(pasteData);
+            } catch (err) {
+                console.error('Send paste error to', peerId, err);
+            }
+        }
+        
+        // Add to local received list
+        addReceivedPaste(pasteData, true);
+        
+        // Clear field after sending
+        clearPasteField();
+        showToast('✅ Content sent to all devices!');
+    }
+    
+    function clearPasteField() {
+        const pasteField = document.getElementById('pasteField');
+        pasteField.innerHTML = '';
+        pasteField.focus();
+    }
+    
+    function receivePasteContent(data, fromPeerId) {
+        addReceivedPaste(data, false);
+        showToast('📋 Received content from ' + (data.senderName || 'a device'));
+    }
+    
+    function addReceivedPaste(data, isLocal) {
+        const container = document.getElementById('pasteReceived');
+        const emptyState = container.querySelector('.paste-empty');
+        if (emptyState) emptyState.remove();
+        
+        const div = document.createElement('div');
+        div.className = 'paste-item';
+        div.dataset.pasteId = data.pasteId;
+        
+        const senderName = isLocal ? 'You' : (data.senderName || 'Device');
+        const timeStr = new Date(data.timestamp).toLocaleTimeString();
+        
+        div.innerHTML = `
+            <div class="paste-header">
+                <span class="paste-sender">${senderName}</span>
+                <span>${timeStr}</span>
+            </div>
+            <div class="paste-content" contenteditable="false">${data.content}</div>
+            <div class="paste-actions">
+                <button class="paste-btn copy" onclick="copyPasteContent(this)">📋 Copy</button>
+                <button class="paste-btn edit" onclick="toggleEditPaste(this)">✏️ Edit</button>
+            </div>
+        `;
+        
+        container.prepend(div);
+    }
+    
+    function copyPasteContent(btn) {
+        const pasteItem = btn.closest('.paste-item');
+        const contentEl = pasteItem.querySelector('.paste-content');
+        const text = contentEl.textContent || contentEl.innerText;
+        
+        navigator.clipboard.writeText(text).then(() => {
+            showToast('📋 Copied to clipboard!');
+        }).catch(() => {
+            // Fallback
+            const ta = document.createElement('textarea');
+            ta.value = text;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('📋 Copied!');
+        });
+    }
+    
+    function toggleEditPaste(btn) {
+        const pasteItem = btn.closest('.paste-item');
+        const contentEl = pasteItem.querySelector('.paste-content');
+        const isEditable = contentEl.contentEditable === 'true';
+        
+        contentEl.contentEditable = !isEditable;
+        btn.textContent = isEditable ? '✏️ Edit' : '✅ Done';
+        
+        if (!isEditable) {
+            contentEl.focus();
+            // Save on blur or enter
+            contentEl.onblur = function() { saveEditedPaste(this, btn); };
+            contentEl.onkeydown = function(e) {
+                if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                    e.preventDefault();
+                    saveEditedPaste(this, btn);
+                    contentEl.blur();
+                }
+            };
+        } else {
+            contentEl.onblur = null;
+            contentEl.onkeydown = null;
+        }
+    }
+    
+    function saveEditedPaste(contentEl, btn) {
+        // Could implement re-broadcast of edited content if needed
+        showToast('✅ Content updated locally');
+    }
+
+    // ==================== FILE TRANSFER ====================
+    function sendFile(file) {
+        if (Object.keys(connections).length === 0) {
+            showToast('⚠️ No devices connected');
+            return;
         }
 
-        // Close modals on outside click
-        document.getElementById('qrModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'qrModal') closeQR();
+        const fileId = generateId(10);
+        const fileInfo = {
+            id: fileId,
+            name: file.name,
+            size: file.size,
+            type: file.type,
+            lastModified: file.lastModified,
+            sender: myPeerId,
+            timestamp: Date.now()
+        };
+
+        addSentFile(fileInfo);
+
+        const reader = new FileReader();
+        let offset = 0;
+
+        function sendChunk() {
+            const chunk = file.slice(offset, offset + CHUNK_SIZE);
+            reader.readAsArrayBuffer(chunk);
+        }
+
+        reader.onload = (e) => {
+            const data = {
+                type: 'file',
+                fileId: fileId,
+                fileName: file.name,
+                fileType: file.type,
+                fileSize: file.size,
+                chunk: e.target.result,
+                offset: offset,
+                lastChunk: offset + CHUNK_SIZE >= file.size,
+                sender: myPeerId
+            };
+
+            for (const peerId in connections) {
+                try {
+                    connections[peerId].send(data);
+                } catch (err) {
+                    console.error('Send error to', peerId, err);
+                }
+            }
+
+            offset += CHUNK_SIZE;
+            updateFileProgress(fileId, offset, file.size);
+
+            if (offset < file.size) {
+                sendChunk();
+            } else {
+                completeFileTransfer(fileId);
+            }
+        };
+
+        sendChunk();
+    }
+
+    function receiveFile(data, fromPeerId) {
+        const fileId = data.fileId;
+
+        if (!receivedFiles[fileId]) {
+            receivedFiles[fileId] = {
+                chunks: [],
+                received: 0,
+                total: data.fileSize,
+                name: data.fileName,
+                type: data.fileType
+            };
+            addReceivedFile({
+                id: fileId,
+                name: data.fileName,
+                size: data.fileSize,
+                type: data.fileType,
+                sender: fromPeerId,
+                timestamp: Date.now()
+            }, fileId);
+        }
+
+        const rf = receivedFiles[fileId];
+        rf.chunks[data.offset] = data.chunk;
+        rf.received += data.chunk?.byteLength || 0;
+
+        updateFileProgress(fileId, rf.received, rf.total);
+
+        if (data.lastChunk) {
+            completeReceive(fileId);
+        }
+    }
+
+    function completeReceive(fileId) {
+        const rf = receivedFiles[fileId];
+        if (!rf) return;
+
+        const blob = new Blob(Object.values(rf.chunks).filter(c => c), { type: rf.type });
+        const url = URL.createObjectURL(blob);
+
+        const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
+        if (fileEl) {
+            const progressFill = fileEl.querySelector('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = '100%';
+                progressFill.classList.add('complete');
+            }
+            const dlBtn = fileEl.querySelector('.file-btn.download');
+            if (dlBtn) {
+                dlBtn.style.display = '';
+                dlBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = rf.name;
+                    a.click();
+                    setTimeout(() => URL.revokeObjectURL(url), 100);
+                };
+            }
+            const meta = fileEl.querySelector('.file-meta');
+            if (meta) meta.textContent = `${formatSize(rf.total)} • ✅ Received`;
+        }
+
+        showToast('✅ Received: ' + rf.name);
+        delete receivedFiles[fileId];
+    }
+
+    function completeFileTransfer(fileId) {
+        const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
+        if (fileEl) {
+            const progressFill = fileEl.querySelector('.progress-fill');
+            if (progressFill) {
+                progressFill.style.width = '100%';
+                progressFill.classList.add('complete');
+            }
+            const meta = fileEl.querySelector('.file-meta');
+            if (meta) meta.textContent = '✅ Sent to all devices';
+        }
+        showToast('✅ File sent successfully!');
+    }
+
+    function announceExistingFiles(conn) {
+        document.querySelectorAll('.file-item[data-direction="sent"]').forEach(el => {
+            const fileId = el.dataset.fileId;
+            const name = el.querySelector('.file-name')?.textContent || '';
+            const meta = el.querySelector('.file-meta')?.textContent || '';
+            const sizeMatch = meta.match(/([\d.]+\s*[KMGT]?B)/);
+            const size = sizeMatch ? parseSize(sizeMatch[1]) : 0;
+            conn.send({
+                type: 'file-announce',
+                fileInfo: { 
+                    id: fileId, 
+                    name, 
+                    size, 
+                    type: 'application/octet-stream', 
+                    sender: 'previous', 
+                    timestamp: Date.now() 
+                }
+            });
         });
-        document.getElementById('scannerModal')?.addEventListener('click', (e) => {
-            if (e.target.id === 'scannerModal') stopQRScanner();
-        });
+    }
+
+    function parseSize(str) {
+        const match = str.match(/([\d.]+)\s*([KMGT]?B)/i);
+        if (!match) return 0;
+        const val = parseFloat(match[1]);
+        const unit = match[2].toUpperCase();
+        const multipliers = { 'B': 1, 'KB': 1024, 'MB': 1048576, 'GB': 1073741824, 'TB': 1099511627776 };
+        return val * (multipliers[unit] || 1);
+    }
+
+    // ==================== UI HELPERS ====================
+    function addSentFile(fileInfo) {
+        const emptyState = fileList.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.dataset.fileId = fileInfo.id;
+        div.dataset.direction = 'sent';
+        div.innerHTML = `
+            <div class="file-icon ${getIconClass(fileInfo.name?.split('.').pop()?.toLowerCase())}">
+                ${getFileIcon(fileInfo.type, fileInfo.name)}
+            </div>
+            <div class="file-info">
+                <div class="file-name" title="${fileInfo.name}">${fileInfo.name}</div>
+                <div class="file-meta">${formatSize(fileInfo.size)} • Sending...</div>
+                <div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>
+            </div>
+            <div class="file-actions">
+                <button class="file-btn remove" onclick="removeFile(this)">✕</button>
+            </div>
+        `;
+        fileList.prepend(div);
+    }
+
+    function addReceivedFile(fileInfo, fileId, isAnnouncement = false) {
+        const emptyState = fileList.querySelector('.empty-state');
+        if (emptyState) emptyState.remove();
+
+        if (document.querySelector(`[data-file-id="${fileInfo.id}"]`)) return;
+
+        const div = document.createElement('div');
+        div.className = 'file-item';
+        div.dataset.fileId = fileId || fileInfo.id;
+        div.dataset.direction = 'received';
+
+        const progressHtml = !isAnnouncement ?
+            `<div class="progress-bar"><div class="progress-fill" style="width:0%"></div></div>` : '';
+        const downloadStyle = isAnnouncement ? 'display:none;' : 'display:none;';
+        const metaText = isAnnouncement ? '📋 Available' : 'Receiving...';
+
+        div.innerHTML = `
+            <div class="file-icon ${getIconClass(fileInfo.name?.split('.').pop()?.toLowerCase())}">
+                ${getFileIcon(fileInfo.type, fileInfo.name)}
+            </div>
+            <div class="file-info">
+                <div class="file-name" title="${fileInfo.name}">${fileInfo.name}</div>
+                <div class="file-meta">${formatSize(fileInfo.size)} • ${metaText}</div>
+                ${progressHtml}
+            </div>
+            <div class="file-actions">
+                <button class="file-btn download" style="${downloadStyle}">⬇ Download</button>
+                <button class="file-btn remove" onclick="removeFile(this)">✕</button>
+            </div>
+        `;
+        fileList.prepend(div);
+    }
+
+    function updateFileProgress(fileId, received, total) {
+        const fileEl = document.querySelector(`[data-file-id="${fileId}"]`);
+        if (!fileEl) return;
         
-        // Keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                closeQR();
-                stopQRScanner();
-            }
-        });
+        const fill = fileEl.querySelector('.progress-fill');
+        if (fill) {
+            fill.style.width = Math.min(100, (received / total * 100)).toFixed(1) + '%';
+        }
+        const meta = fileEl.querySelector('.file-meta');
+        if (meta && !fill?.classList.contains('complete')) {
+            const pct = (received / total * 100).toFixed(0);
+            meta.textContent = `${formatSize(received)} / ${formatSize(total)} • ${pct}%`;
+        }
+    }
 
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check for join URL
-            checkJoinFromURL();
-            
-            // Auto-focus identifier input
-            document.getElementById('myIdentifier')?.focus();
-            
-            // Set a random identifier as placeholder suggestion
-            document.getElementById('myIdentifier').placeholder = `e.g. ${generateRandomIdentifier()}`;
-        });
+    function removeFile(btn) {
+        const item = btn.closest('.file-item');
+        item.style.animation = 'toastOut 0.3s ease forwards';
+        setTimeout(() => item.remove(), 300);
+    }
 
-        // Handle page visibility changes (pause/resume scanner)
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden && html5QrCode) {
-                // Pause scanner when tab is hidden
-                html5QrCode.pause();
-            } else if (!document.hidden && html5QrCode?.isScanning) {
-                // Resume when tab is visible
-                html5QrCode.resume();
-            }
+    function updatePeerList() {
+        const peers = Object.keys(connections);
+        peerCountBadge.textContent = peers.length;
+
+        if (peers.length === 0) {
+            peerList.innerHTML = '<div class="empty-state">No devices connected yet</div>';
+            return;
+        }
+
+        peerList.innerHTML = '';
+        
+        // Show self first
+        const selfDiv = document.createElement('div');
+        selfDiv.className = 'peer-item';
+        selfDiv.innerHTML = `
+            <div class="peer-avatar">👤</div>
+            <div class="peer-name peer-you">${myIdentifier || 'You'} (you)</div>
+            <div class="peer-status">● Online</div>
+        `;
+        peerList.appendChild(selfDiv);
+        
+        // Show connected peers
+        peers.forEach((peerId, i) => {
+            const conn = connections[peerId];
+            const meta = conn?.metadata || {};
+            const displayName = meta.displayName || `${meta.name || 'Device'} ${i + 1}`;
+            
+            const div = document.createElement('div');
+            div.className = 'peer-item';
+            div.dataset.peerId = peerId;
+            div.innerHTML = `
+                <div class="peer-avatar">📱</div>
+                <div class="peer-name">${displayName}</div>
+                <div class="peer-status">● Online</div>
+            `;
+            peerList.appendChild(div);
+            
+            // Send our info to this peer
+            conn?.send({
+                type: 'peer-info',
+                displayName: `${getDeviceName()} (${myPeerId?.slice(-4) || '???'})`
+            });
         });
-    </script>
+    }
+
+    function updateStatus() {
+        const count = Object.keys(connections).length;
+        if (count === 0) {
+            setStatus('disconnected', 'No devices connected');
+        } else {
+            setStatus('connected', `${count} device${count > 1 ? 's' : ''} connected`);
+        }
+    }
+
+    function enableDropZone() {
+        dropZone.classList.remove('disabled');
+    }
+
+    function disableDropZone() {
+        dropZone.classList.add('disabled');
+    }
+
+    // ==================== EVENT LISTENERS ====================
+    fileInput.addEventListener('change', (e) => {
+        Array.from(e.target.files).forEach(file => sendFile(file));
+        fileInput.value = '';
+    });
+
+    dropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+        dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        dropZone.classList.remove('dragover');
+        Array.from(e.dataTransfer.files).forEach(file => sendFile(file));
+    });
+
+    // Paste field event listener
+    document.getElementById('pasteField')?.addEventListener('paste', handlePasteFieldPaste);
+
+    // Identifier input handling
+    document.getElementById('myIdentifier')?.addEventListener('input', (e) => {
+        e.target.value = sanitizeIdentifier(e.target.value);
+    });
+    
+    document.getElementById('joinIdentifier')?.addEventListener('input', (e) => {
+        e.target.value = sanitizeIdentifier(e.target.value);
+    });
+    
+    document.getElementById('joinIdentifier')?.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') joinRoom();
+    });
+
+    // ==================== UTILITIES ====================
+    function copyRoomCode() {
+        const code = roomCodeDisplay.textContent;
+        if (!code || code === '------') {
+            showToast('⚠️ No room code to copy', 'error');
+            return;
+        }
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const btn = document.getElementById('copyBtn');
+            btn.classList.add('copied');
+            btn.textContent = '✅';
+            setTimeout(() => {
+                btn.classList.remove('copied');
+                btn.textContent = '📋';
+            }, 2000);
+            showToast('📋 Identifier copied to clipboard!');
+        }).catch(() => {
+            const ta = document.createElement('textarea');
+            ta.value = code;
+            document.body.appendChild(ta);
+            ta.select();
+            document.execCommand('copy');
+            document.body.removeChild(ta);
+            showToast('📋 Identifier copied!');
+        });
+    }
+
+    function leaveRoom() {
+        // Close all connections
+        Object.values(connections).forEach(conn => {
+            try { conn.close(); } catch(e) {}
+        });
+        connections = {};
+        
+        // Destroy peer
+        if (peer) {
+            try { peer.destroy(); } catch(e) {}
+            peer = null;
+        }
+        
+        // Reset state
+        receivedFiles = {};
+        isHost = false;
+        myPeerId = null;
+        peerCounter = 0;
+        
+        // Reset UI
+        showScreen(setupScreen);
+        hostSection.style.display = 'none';
+        showQrBtn.style.display = 'none';
+        document.getElementById('inlineQrContainer').style.display = 'none';
+        document.getElementById('inlineQrWrapper').innerHTML = '';
+        document.getElementById('createRoomBtn').disabled = false;
+        document.getElementById('createRoomBtn').innerHTML = '✨ Create Room';
+        document.getElementById('joinRoomBtn').disabled = false;
+        document.getElementById('joinRoomBtn').innerHTML = '🔗 Join Room';
+        document.getElementById('joinIdentifier').value = '';
+        fileList.innerHTML = '<div class="empty-state">No files transferred yet</div>';
+        peerList.innerHTML = '<div class="empty-state">No devices connected yet</div>';
+        disableDropZone();
+        setStatus('disconnected', 'Disconnected');
+        
+        // Stop any active QR scanner
+        stopQRScanner();
+        
+        showToast('🚪 Left room');
+    }
+
+    // Close modals on outside click
+    document.getElementById('qrModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'qrModal') closeQR();
+    });
+    document.getElementById('scannerModal')?.addEventListener('click', (e) => {
+        if (e.target.id === 'scannerModal') stopQRScanner();
+    });
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeQR();
+            stopQRScanner();
+        }
+    });
+
+    // ==================== INITIALIZATION ====================
+    document.addEventListener('DOMContentLoaded', () => {
+        // Check for join URL
+        checkJoinFromURL();
+        
+        // Auto-focus identifier input
+        document.getElementById('myIdentifier')?.focus();
+        
+        // Set a random identifier as placeholder suggestion
+        document.getElementById('myIdentifier').placeholder = `e.g. ${generateRandomIdentifier()}`;
+    });
+
+    // Handle page visibility changes (pause/resume scanner)
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden && html5QrCode) {
+            // Pause scanner when tab is hidden
+            html5QrCode.pause();
+        } else if (!document.hidden && html5QrCode?.isScanning) {
+            // Resume when tab is visible
+            html5QrCode.resume();
+        }
+    });
+</script>
 </body>
 </html>
